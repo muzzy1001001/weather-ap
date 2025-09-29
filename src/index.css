@@ -1,4 +1,4 @@
-/* Make sure app takes full screen */
+/* Full screen setup */
 html, body, #root {
   margin: 0;
   padding: 0;
@@ -11,7 +11,7 @@ body {
   color: #fff;
 }
 
-/* App container full size */
+/* App container */
 .app {
   width: 100%;
   height: 100%;
@@ -30,23 +30,17 @@ body {
 .default-bg {
   background: linear-gradient(to right, #74ebd5, #9face6);
 }
-
 .sunny-bg {
   background: linear-gradient(to bottom, #f9d423, #ff4e50);
 }
-
 .rainy-bg {
   background: linear-gradient(to bottom, #4facfe, #00f2fe);
 }
-
 .cloudy-bg {
   background: linear-gradient(to bottom, #757f9a, #d7dde8);
 }
 
 /* TOP LEFT */
-
-
-
 .top-left {
   grid-area: left;
   display: flex;
@@ -55,36 +49,43 @@ body {
   align-items: flex-start;
   padding-left: 40px;
 }
-
 .top-left h1 {
   font-size: 5rem;
   margin: 0;
 }
-
 .top-left h2 {
   font-size: 2.5rem;
   margin: 5px 0;
 }
-
 .top-left p {
   margin: 5px 0;
 }
-
 .top-left .location {
   font-size: 1rem;
   opacity: 0.9;
 }
-
 .temperature-section {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 .weather-icon {
   width: 150px;
   height: 150px;
 }
+
+/* Location in top-left */
+.location {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.location-icon {
+  width: 18px;
+  margin-right: 5px;
+}
+
 
 /* TOP RIGHT */
 .top-right {
@@ -96,27 +97,41 @@ body {
   padding-right: 40px;
 }
 
-.top-right input {
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  outline: none;
-  font-size: 1rem;
-}
-
-.datetime {
-  padding-top: 0px;
-  text-align: right;
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 25px;
+  padding: 8px 12px;
+  width: 250px;
   margin-bottom: 20px;
 }
 
+.search-bar input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+  background: transparent;
+}
+
+.search-icon {
+  width: 20px;
+  margin-right: 8px;
+}
+
+/* Date & Time */
+.datetime {
+  text-align: right;
+  margin-bottom: 20px;
+}
 .datetime .time {
   font-size: 3rem;
   font-weight: bold;
   margin: 5px 0;
 }
-
 .datetime .date {
   font-size: 1rem;
   font-weight: bold;
@@ -124,20 +139,49 @@ body {
   padding-bottom: 60px;
 }
 
+/* Forecast Cards */
 .forecast {
   display: flex;
   gap: 15px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  margin-top: 20px;
 }
 
-.forecast-day {
-  background: rgba(255, 255, 255, 0.25);
-  padding: 12px 15px;
+.forecast-card {
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 12px;
+  padding: 10px;
   text-align: center;
   min-width: 90px;
-  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+}
+
+.forecast-icon {
+  width: 30px;
+  margin: 5px 0;
+}
+
+/* Temperature Row */
+.temp-row {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* spacing between temp and icon */
+}
+
+.temperature {
+  font-size: 5rem;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+}
+
+.degree {
+  font-size: 2.5rem;
+  margin-left: 5px;
+}
+
+.weather-icon {
+  width: 150px; /* adjust to your liking */
+  height: 150px;
 }
 
 /* BOTTOM RIGHT */
@@ -148,12 +192,10 @@ body {
   padding: 20px 40px;
   opacity: 0.9;
 }
-
 .bottom-right a {
   color: #fff;
   text-decoration: underline;
 }
-
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -166,33 +208,26 @@ body {
     grid-template-rows: auto auto auto;
     padding: 20px;
   }
-
   .top-left,
   .top-right {
     padding: 20px;
     align-items: flex-start;
   }
-
   .top-left h1 {
     font-size: 3.5rem;
   }
-
   .top-left h2 {
     font-size: 1.8rem;
   }
-
   .datetime {
     text-align: left;
   }
-
   .datetime .time {
     font-size: 1.8rem;
   }
-
   .datetime .date {
     font-size: 0.9rem;
   }
-
   .bottom-right {
     text-align: center;
     padding: 15px;
