@@ -57,8 +57,8 @@ const StyledWrapper = styled.div`
     --spot-color: #959DB1;
     --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
     --stars-color: #fff;
-    --clouds-color: #F3FDFF;
-    --back-clouds-color: #AACADF;
+    --clouds-color: var(--clouds-color, #F3FDFF);
+    --back-clouds-color: var(--back-clouds-color, #AACADF);
     --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
     --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
   }

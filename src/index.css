@@ -6,9 +6,93 @@ html, body, #root {
   height: 100%;
 }
 
+/* CSS Custom Properties for Theming */
+:root {
+  --bg-color: #fff;
+  --text-color: #333;
+  --sidebar-bg: rgba(255,255,255,0.1);
+  --sidebar-border: rgba(255,255,255,0.2);
+  --menu-text: #fff;
+  --menu-hover: rgba(255,255,255,0.1);
+  --popup-bg: rgba(255,255,255,0.95);
+  --popup-text: #333;
+  --button-bg: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  --button-text: #fff;
+  --input-bg: #fff;
+  --input-text: #333;
+  --forecast-bg: rgba(255, 255, 255, 0.2);
+  --forecast-text: #fff;
+  --location-icon-filter: none;
+  --weather-icon-filter: none;
+  --search-icon-filter: none;
+  --delete-btn-bg: rgba(255,0,0,0.1);
+  --delete-btn-text: #d32f2f;
+  --close-btn-bg: #666;
+  --clear-btn-bg: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  --menu-toggle-bg: rgba(255,255,255,0.2);
+  --theme-toggle-bg: rgba(255,255,255,0.1);
+  --loading-text: #fff;
+  --tagline-text: #fff;
+  --history-border: rgba(255,255,255,0.2);
+  --history-text: #fff;
+  --history-strong: #fff;
+  --history-em: #ccc;
+  --history-hover: rgba(255,255,255,0.05);
+  --bottom-right-text: #fff;
+  --bottom-right-link: #fff;
+  --default-bg: linear-gradient(to right, #74ebd5, #9face6);
+  --sunny-bg: linear-gradient(to bottom, #f9d423, #ff4e50);
+  --rainy-bg: linear-gradient(to bottom, #4facfe, #00f2fe);
+  --cloudy-bg: linear-gradient(to bottom, #757f9a, #d7dde8);
+  --clouds-color: #333;
+  --back-clouds-color: #111;
+}
+
+.app.dark-mode {
+  --bg-color: #000;
+  --text-color: #fff;
+  --sidebar-bg: rgba(0,0,0,0.95);
+  --sidebar-border: rgba(0,0,0,0.3);
+  --menu-text: #fff;
+  --menu-hover: rgba(255,255,255,0.15);
+  --popup-bg: rgba(0,0,0,0.95);
+  --popup-text: #fff;
+  --button-bg: linear-gradient(45deg, #d32f2f, #b71c1c);
+  --button-text: #fff;
+  --input-bg: rgba(255,255,255,0.9);
+  --input-text: #333;
+  --forecast-bg: rgba(255, 255, 255, 0.1);
+  --forecast-text: #fff;
+  --location-icon-filter: invert(1);
+  --weather-icon-filter: invert(1) brightness(1.2) contrast(1.1);
+  --search-icon-filter: invert(1);
+  --delete-btn-bg: rgba(255,0,0,0.25);
+  --delete-btn-text: #ff8a80;
+  --close-btn-bg: #555;
+  --clear-btn-bg: linear-gradient(45deg, #d32f2f, #b71c1c);
+  --menu-toggle-bg: rgba(0,0,0,0.4);
+  --theme-toggle-bg: rgba(0,0,0,0.4);
+  --loading-text: #fff;
+  --tagline-text: #fff;
+  --history-border: rgba(255,255,255,0.15);
+  --history-text: #fff;
+  --history-strong: #fff;
+  --history-em: #ccc;
+  --history-hover: rgba(255,255,255,0.08);
+  --bottom-right-text: #fff;
+  --bottom-right-link: #fff;
+  --default-bg: linear-gradient(to right, #1a1a1a, #2d2d2d);
+  --sunny-bg: linear-gradient(to bottom, #2c1810, #1a0f0a);
+  --rainy-bg: linear-gradient(to bottom, #0f1419, #1a2332);
+  --cloudy-bg: linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+  --clouds-color: #F3FDFF;
+  --back-clouds-color: #AACADF;
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  color: #fff;
+  color: var(--text-color);
+  background: var(--bg-color);
 }
 
 /* App container */
@@ -21,10 +105,10 @@ body {
 /* Sidebar */
 .sidebar {
   width: 0;
-  background: rgba(255,255,255,0.1);
+  background: var(--sidebar-bg);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border-right: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid var(--sidebar-border);
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
   transition: width 0.3s ease;
   overflow: hidden;
@@ -36,7 +120,7 @@ body {
 
 .menu-content {
   padding: 20px 15px;
-  color: white;
+  color: var(--menu-text);
   height: 100%;
   overflow-y: auto;
 }
@@ -58,7 +142,7 @@ body {
 }
 
 .menu-content section:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--menu-hover);
 }
 
 .menu-content h3 {
@@ -89,7 +173,7 @@ body {
 }
 
 .popup-content {
-  background: rgba(255,255,255,0.95);
+  background: var(--popup-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 20px;
@@ -99,7 +183,7 @@ body {
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  color: #333;
+  color: var(--popup-text);
 }
 
 .popup-content h2 {
@@ -116,26 +200,35 @@ body {
 
 .history-list li {
   margin-bottom: 15px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid var(--history-border);
   padding-bottom: 10px;
   cursor: pointer;
   transition: background 0.3s ease;
   position: relative;
   padding-right: 40px; /* space for button */
+  color: var(--history-text);
 }
 
 .history-list li:hover {
-  background: rgba(0,0,0,0.05);
+  background: var(--history-hover);
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 5px;
 }
 
+.history-list li strong {
+  color: var(--history-strong);
+}
+
+.history-list li em {
+  color: var(--history-em);
+}
+
 .clear-btn {
-  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  background: var(--button-bg);
   border: none;
   padding: 10px 20px;
-  color: white;
+  color: var(--button-text);
   border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
@@ -144,10 +237,10 @@ body {
 }
 
 .clear-btn-top {
-  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  background: var(--clear-btn-bg);
   border: none;
   padding: 8px 16px;
-  color: white;
+  color: var(--button-text);
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
@@ -160,10 +253,10 @@ body {
 }
 
 .close-btn {
-  background: #666;
+  background: var(--close-btn-bg);
   border: none;
   padding: 10px 20px;
-  color: white;
+  color: var(--button-text);
   border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
@@ -198,16 +291,16 @@ body {
 
 /* Background Themes */
 .default-bg {
-  background: linear-gradient(to right, #74ebd5, #9face6);
+  background: var(--default-bg);
 }
 .sunny-bg {
-  background: linear-gradient(to bottom, #f9d423, #ff4e50);
+  background: var(--sunny-bg);
 }
 .rainy-bg {
-  background: linear-gradient(to bottom, #4facfe, #00f2fe);
+  background: var(--rainy-bg);
 }
 .cloudy-bg {
-  background: linear-gradient(to bottom, #757f9a, #d7dde8);
+  background: var(--cloudy-bg);
 }
 
 /* MENU TOGGLE */
@@ -215,19 +308,20 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: rgba(255,255,255,0.2);
+  background: var(--menu-toggle-bg);
   border: none;
   padding: 12px 16px;
   font-size: 1.5rem;
   cursor: pointer;
   border-radius: 50%;
-  color: white;
+  color: var(--text-color);
   z-index: 1000;
   transition: background 0.3s ease;
 }
 
 .menu-toggle:hover {
-  background: rgba(255,255,255,0.3);
+  background: var(--menu-toggle-bg);
+  opacity: 0.8;
 }
 
 /* THEME TOGGLE */
@@ -236,14 +330,15 @@ body {
   top: 20px;
   right: 20px;
   z-index: 1000;
-  background: rgba(255,255,255,0.1);
+  background: var(--theme-toggle-bg);
   border-radius: 50%;
   padding: 5px;
   transition: background 0.3s ease;
 }
 
 .theme-toggle:hover {
-  background: rgba(255,255,255,0.2);
+  background: var(--theme-toggle-bg);
+  opacity: 0.8;
 }
 
 .history-list {
@@ -274,21 +369,26 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-left: 40px;
+  color: var(--text-color);
 }
 .top-left h1 {
   font-size: 5rem;
   margin: 0;
+  color: var(--text-color);
 }
 .top-left h2 {
   font-size: 2.5rem;
   margin: 5px 0;
+  color: var(--text-color);
 }
 .top-left p {
   margin: 5px 0;
+  color: var(--text-color);
 }
 .top-left .location {
   font-size: 1rem;
   opacity: 0.9;
+  color: var(--text-color);
 }
 .temperature-section {
   display: flex;
@@ -298,6 +398,7 @@ body {
 .weather-icon {
   width: 150px;
   height: 150px;
+  filter: var(--weather-icon-filter);
 }
 
 /* Location in top-left */
@@ -310,6 +411,7 @@ body {
 .location-icon {
   width: 18px;
   margin-right: 5px;
+  filter: var(--location-icon-filter);
 }
 
 
@@ -321,6 +423,7 @@ body {
   align-items: flex-end;
   justify-content: center;
   padding-right: 40px;
+  color: var(--text-color);
 }
 
 .history {
@@ -346,9 +449,9 @@ body {
 }
 
 .delete-btn {
-  background: rgba(255,0,0,0.1);
+  background: var(--delete-btn-bg);
   border: none;
-  color: #d32f2f;
+  color: var(--delete-btn-text);
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 50%;
@@ -361,8 +464,8 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 .delete-btn:hover {
-  background: rgba(255,0,0,0.2);
-  color: #b71c1c;
+  background: var(--delete-btn-bg);
+  opacity: 0.8;
 }
 
 
@@ -370,7 +473,7 @@ body {
 .search-bar {
   display: flex;
   align-items: center;
-  background: white;
+  background: var(--input-bg);
   border-radius: 25px;
   padding: 8px 12px;
   width: 250px;
@@ -384,28 +487,33 @@ body {
   padding: 8px;
   font-size: 16px;
   background: transparent;
+  color: var(--input-text);
 }
 
 .search-icon {
   width: 20px;
   margin-right: 8px;
+  filter: var(--search-icon-filter);
 }
 
 /* Date & Time */
 .datetime {
   text-align: right;
   margin-bottom: 20px;
+  color: var(--text-color);
 }
 .datetime .time {
   font-size: 3rem;
   font-weight: bold;
   margin: 5px 0;
+  color: var(--text-color);
 }
 .datetime .date {
   font-size: 1rem;
   font-weight: bold;
   margin: 3px 0;
   padding-bottom: 60px;
+  color: var(--text-color);
 }
 
 /* Forecast Cards */
@@ -416,7 +524,7 @@ body {
 }
 
 .forecast-card {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--forecast-bg);
   border-radius: 12px;
   padding: 30px;
   text-align: center;
@@ -424,6 +532,7 @@ body {
   backdrop-filter: blur(5px);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  color: var(--forecast-text);
 }
 
 .forecast-card:hover {
@@ -434,6 +543,7 @@ body {
 .forecast-icon {
   width: 50px;
   margin: 5px 0;
+  filter: var(--weather-icon-filter);
 }
 
 /* Temperature Row */
@@ -448,6 +558,7 @@ body {
   margin: 0;
   display: flex;
   align-items: baseline;
+  color: var(--text-color);
 }
 
 .degree {
@@ -467,809 +578,21 @@ body {
   font-size: 1rem;
   padding: 20px 40px;
   opacity: 0.9;
+  color: var(--bottom-right-text);
 }
 
-/* DARK MODE */
-.app.dark-mode {
-  color: #fff !important;
+.bottom-right a {
+  color: var(--bottom-right-link);
+  text-decoration: underline;
 }
 
-.app.dark-mode * {
-  color: inherit !important;
+/* Ensure all text in main content areas uses proper color */
+.top-left *,
+.top-right *,
+.bottom-right * {
+  color: inherit;
 }
 
-/* Dark mode body */
-.app.dark-mode body {
-  color: #fff !important;
-}
-
-/* Dark mode html */
-.app.dark-mode html {
-  color: #fff !important;
-}
-
-/* Dark mode root */
-.app.dark-mode #root {
-  color: #fff !important;
-}
-
-/* Force dark mode styles */
-.app.dark-mode,
-.app.dark-mode *,
-.app.dark-mode *::before,
-.app.dark-mode *::after {
-  color: inherit !important;
-}
-
-/* Dark mode specific elements */
-.app.dark-mode .top-left,
-.app.dark-mode .top-right,
-.app.dark-mode .bottom-right {
-  color: #fff !important;
-}
-
-/* Dark mode menu toggle */
-.app.dark-mode .menu-toggle {
-  background: rgba(0,0,0,0.3) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .menu-toggle:hover {
-  background: rgba(0,0,0,0.5) !important;
-}
-
-/* Dark mode theme toggle */
-.app.dark-mode .theme-toggle {
-  background: rgba(0,0,0,0.3) !important;
-}
-
-.app.dark-mode .theme-toggle:hover {
-  background: rgba(0,0,0,0.5) !important;
-}
-
-/* Dark mode loading text */
-.app.dark-mode .loading-text {
-  color: #fff !important;
-}
-
-/* Dark mode error text */
-.app.dark-mode .tagline {
-  color: #fff !important;
-}
-
-/* Dark mode main loading text */
-.app.dark-mode .loading-text {
-  color: #fff !important;
-}
-
-/* Dark mode main loading text */
-.app.dark-mode .loading-text {
-  color: #fff !important;
-}
-
-/* Dark mode menu toggle */
-.app.dark-mode .menu-toggle {
-  background: rgba(0,0,0,0.4) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .menu-toggle:hover {
-  background: rgba(0,0,0,0.6) !important;
-}
-
-/* Dark mode theme toggle */
-.app.dark-mode .theme-toggle {
-  background: rgba(0,0,0,0.4) !important;
-}
-
-.app.dark-mode .theme-toggle:hover {
-  background: rgba(0,0,0,0.6) !important;
-}
-
-/* Dark mode transitions */
-.app.dark-mode,
-.app.dark-mode * {
-  transition: all 0.3s ease !important;
-}
-
-/* Dark mode menu toggle button */
-.app.dark-mode .menu-toggle {
-  background: rgba(0,0,0,0.4) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .menu-toggle:hover {
-  background: rgba(0,0,0,0.6) !important;
-}
-
-/* Dark mode theme toggle button */
-.app.dark-mode .theme-toggle {
-  background: rgba(0,0,0,0.4) !important;
-}
-
-.app.dark-mode .theme-toggle:hover {
-  background: rgba(0,0,0,0.6) !important;
-}
-
-/* Dark mode transitions */
-.app.dark-mode,
-.app.dark-mode * {
-  transition: all 0.3s ease !important;
-}
-
-/* Dark mode body */
-.app.dark-mode body {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode body */
-.app.dark-mode body {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode html */
-.app.dark-mode html {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode html */
-.app.dark-mode html {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode root */
-.app.dark-mode #root {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode root */
-.app.dark-mode #root {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode app container */
-.app.dark-mode .app {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode app container */
-.app.dark-mode .app {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode main content */
-.app.dark-mode .main {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode main content */
-.app.dark-mode .main {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode grid areas */
-.app.dark-mode .top-left,
-.app.dark-mode .top-right,
-.app.dark-mode .bottom-right {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode grid areas */
-.app.dark-mode .top-left,
-.app.dark-mode .top-right,
-.app.dark-mode .bottom-right {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode datetime */
-.app.dark-mode .datetime {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode datetime */
-.app.dark-mode .datetime {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode location */
-.app.dark-mode .location {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temp row */
-.app.dark-mode .temp-row {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temperature */
-.app.dark-mode .temperature {
-  color: #fff !important;
-}
-
-/* Dark mode search bar */
-.app.dark-mode .search-bar {
-  background: rgba(255,255,255,0.9) !important;
-}
-
-.app.dark-mode .search-bar input {
-  background: transparent !important;
-  color: #333 !important;
-}
-
-/* Dark mode location */
-.app.dark-mode .location {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temp row */
-.app.dark-mode .temp-row {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temperature */
-.app.dark-mode .temperature {
-  color: #fff !important;
-}
-
-/* Dark mode search bar */
-.app.dark-mode .search-bar {
-  background: rgba(255,255,255,0.9) !important;
-}
-
-.app.dark-mode .search-bar input {
-  background: transparent !important;
-  color: #333 !important;
-}
-
-/* Dark mode search icon */
-.app.dark-mode .search-icon {
-  filter: invert(1) !important;
-}
-
-/* Dark mode location icon */
-.app.dark-mode .location-icon {
-  filter: invert(1) !important;
-}
-
-/* Dark mode weather icons */
-.app.dark-mode .weather-icon,
-.app.dark-mode .forecast-icon {
-  filter: invert(1) brightness(0.8) !important;
-}
-
-/* Dark mode forecast cards */
-.app.dark-mode .forecast-card {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .forecast-card p {
-  color: #fff !important;
-}
-
-/* Dark mode forecast hover */
-.app.dark-mode .forecast-card:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  transform: scale(1.1) !important;
-}
-
-/* Dark mode sidebar */
-.app.dark-mode .sidebar {
-  background: rgba(0,0,0,0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-}
-
-/* Dark mode menu content */
-.app.dark-mode .menu-content {
-  color: #fff !important;
-}
-
-/* Dark mode menu h2 */
-.app.dark-mode .menu-content h2 {
-  color: #fff !important;
-  border-bottom: 1px solid rgba(255,255,255,0.4) !important;
-}
-
-/* Dark mode menu h3 */
-.app.dark-mode .menu-content h3 {
-  color: #fff !important;
-}
-
-/* Dark mode menu section */
-.app.dark-mode .menu-content section {
-  background: transparent !important;
-}
-
-/* Dark mode menu section hover */
-.app.dark-mode .menu-content section:hover {
-  background: rgba(255,255,255,0.15) !important;
-}
-
-/* Dark mode menu h3 hover */
-.app.dark-mode .menu-content h3:hover {
-  color: rgba(255,255,255,0.9) !important;
-}
-
-/* Dark mode popup overlay */
-.app.dark-mode .popup-overlay {
-  background: rgba(0,0,0,0.7) !important;
-}
-
-/* Dark mode popup content */
-.app.dark-mode .popup-content {
-  background: rgba(0,0,0,0.95) !important;
-  color: #fff !important;
-}
-
-/* Dark mode popup h2 */
-.app.dark-mode .popup-content h2 {
-  color: #fff !important;
-}
-
-/* Dark mode history list */
-.app.dark-mode .history-list li {
-  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .history-list li strong {
-  color: #fff !important;
-}
-
-.app.dark-mode .history-list li em {
-  color: #ccc !important;
-}
-
-/* Dark mode history list hover */
-.app.dark-mode .history-list li:hover {
-  background: rgba(255,255,255,0.08) !important;
-}
-
-/* Dark mode close button */
-.app.dark-mode .close-btn {
-  background: #555 !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .close-btn:hover {
-  background: #777 !important;
-}
-
-/* Dark mode clear button */
-.app.dark-mode .clear-btn-top {
-  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
-  color: #fff !important;
-}
-
-/* Dark mode delete button */
-.app.dark-mode .delete-btn {
-  background: rgba(255,0,0,0.25) !important;
-  color: #ff8a80 !important;
-}
-
-.app.dark-mode .delete-btn:hover {
-  background: rgba(255,0,0,0.35) !important;
-  color: #ff6659 !important;
-}
-
-/* Dark mode forecast loading */
-.app.dark-mode .forecast-loading {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .forecast-loading .loading-text {
-  color: #fff !important;
-}
-
-/* Dark mode no recent searches */
-.app.dark-mode .popup-content p {
-  color: #ddd !important;
-}
-
-/* Dark mode error text */
-.app.dark-mode .tagline {
-  color: #fff !important;
-}
-
-/* Dark mode location icon */
-.app.dark-mode .location-icon {
-  filter: invert(1) !important;
-}
-
-/* Dark mode search icon */
-.app.dark-mode .search-icon {
-  filter: invert(1) !important;
-}
-
-/* Dark mode weather icons */
-.app.dark-mode .weather-icon,
-.app.dark-mode .forecast-icon {
-  filter: invert(1) brightness(0.8) !important;
-}
-
-/* Dark mode close button */
-.app.dark-mode .close-btn {
-  background: #444 !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .close-btn:hover {
-  background: #666 !important;
-}
-
-/* Dark mode clear button */
-.app.dark-mode .clear-btn,
-.app.dark-mode .clear-btn-top {
-  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
-  color: #fff !important;
-}
-
-/* Dark mode delete button */
-.app.dark-mode .delete-btn {
-  background: rgba(255,0,0,0.2) !important;
-  color: #ff6b6b !important;
-}
-
-.app.dark-mode .delete-btn:hover {
-  background: rgba(255,0,0,0.3) !important;
-  color: #ff5252 !important;
-}
-
-/* Dark mode forecast loading */
-.app.dark-mode .forecast-loading {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
-}
-
-/* Dark mode no recent searches */
-.app.dark-mode .popup-content p {
-  color: #ccc !important;
-}
-
-/* Dark mode transitions */
-.app.dark-mode,
-.app.dark-mode * {
-  transition: background 0.3s ease, color 0.3s ease, filter 0.3s ease !important;
-}
-
-/* Ensure dark mode styles override everything */
-.app.dark-mode {
-  background: #000 !important;
-}
-
-/* Force dark mode on all elements */
-.app.dark-mode,
-.app.dark-mode *,
-.app.dark-mode *::before,
-.app.dark-mode *::after {
-  background-color: inherit !important;
-  color: inherit !important;
-}
-
-/* Override body styles in dark mode */
-.app.dark-mode body {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Override html styles in dark mode */
-.app.dark-mode html {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Override root styles in dark mode */
-.app.dark-mode #root {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode app container */
-.app.dark-mode .app {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode main content */
-.app.dark-mode .main {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode grid areas */
-.app.dark-mode .top-left,
-.app.dark-mode .top-right,
-.app.dark-mode .bottom-right {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode datetime */
-.app.dark-mode .datetime {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode location */
-.app.dark-mode .location {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temp row */
-.app.dark-mode .temp-row {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Dark mode temperature */
-.app.dark-mode .temperature {
-  color: #fff !important;
-}
-
-/* Dark mode search bar background */
-.app.dark-mode .search-bar {
-  background: rgba(255,255,255,0.9) !important;
-}
-
-/* Dark mode search bar input */
-.app.dark-mode .search-bar input {
-  background: transparent !important;
-  color: #333 !important;
-}
-
-/* Dark mode forecast cards */
-.app.dark-mode .forecast-card {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .forecast-card p {
-  color: #fff !important;
-}
-
-/* Dark mode forecast icons */
-.app.dark-mode .forecast-icon {
-  filter: invert(1) brightness(0.8) !important;
-}
-
-/* Dark mode hover effects */
-.app.dark-mode .forecast-card:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  transform: scale(1.1) !important;
-}
-
-/* Dark mode menu section hover */
-.app.dark-mode .menu-content section:hover {
-  background: rgba(255,255,255,0.15) !important;
-}
-
-/* Dark mode menu h3 hover */
-.app.dark-mode .menu-content h3:hover {
-  color: rgba(255,255,255,0.9) !important;
-}
-
-/* Dark mode menu h2 */
-.app.dark-mode .menu-content h2 {
-  color: #fff !important;
-  border-bottom: 1px solid rgba(255,255,255,0.4) !important;
-}
-
-/* Dark mode menu h3 */
-.app.dark-mode .menu-content h3 {
-  color: #fff !important;
-}
-
-/* Dark mode menu section */
-.app.dark-mode .menu-content section {
-  background: transparent !important;
-}
-
-/* Dark mode sidebar */
-.app.dark-mode .sidebar {
-  background: rgba(0,0,0,0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-}
-
-/* Dark mode popup overlay */
-.app.dark-mode .popup-overlay {
-  background: rgba(0,0,0,0.7) !important;
-}
-
-/* Dark mode popup content */
-.app.dark-mode .popup-content {
-  background: rgba(0,0,0,0.95) !important;
-  color: #fff !important;
-}
-
-/* Dark mode popup h2 */
-.app.dark-mode .popup-content h2 {
-  color: #fff !important;
-}
-
-/* Dark mode history list items */
-.app.dark-mode .history-list li {
-  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .history-list li strong {
-  color: #fff !important;
-}
-
-.app.dark-mode .history-list li em {
-  color: #ccc !important;
-}
-
-/* Dark mode history list hover */
-.app.dark-mode .history-list li:hover {
-  background: rgba(255,255,255,0.08) !important;
-}
-
-/* Dark mode close button */
-.app.dark-mode .close-btn {
-  background: #555 !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .close-btn:hover {
-  background: #777 !important;
-}
-
-/* Dark mode clear button top */
-.app.dark-mode .clear-btn-top {
-  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
-  color: #fff !important;
-}
-
-/* Dark mode delete button */
-.app.dark-mode .delete-btn {
-  background: rgba(255,0,0,0.25) !important;
-  color: #ff8a80 !important;
-}
-
-.app.dark-mode .delete-btn:hover {
-  background: rgba(255,0,0,0.35) !important;
-  color: #ff6659 !important;
-}
-
-/* Dark mode forecast loading */
-.app.dark-mode .forecast-loading {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .forecast-loading .loading-text {
-  color: #fff !important;
-}
-
-/* Dark mode no recent searches text */
-.app.dark-mode .popup-content p {
-  color: #ddd !important;
-}
-
-/* Dark mode error text */
-.app.dark-mode .tagline {
-  color: #fff !important;
-}
-
-/* Dark mode search bar */
-.app.dark-mode .search-bar {
-  background: rgba(255,255,255,0.9) !important;
-}
-
-.app.dark-mode .search-bar input {
-  color: #333 !important;
-}
-
-/* Dark mode forecast cards */
-.app.dark-mode .forecast-card {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .forecast-card p {
-  color: #fff !important;
-}
-
-.app.dark-mode .default-bg {
-  background: linear-gradient(to right, #1a1a1a, #2d2d2d) !important;
-}
-
-.app.dark-mode .sunny-bg {
-  background: linear-gradient(to bottom, #2c1810, #1a0f0a) !important;
-}
-
-.app.dark-mode .rainy-bg {
-  background: linear-gradient(to bottom, #0f1419, #1a2332) !important;
-}
-
-.app.dark-mode .cloudy-bg {
-  background: linear-gradient(to bottom, #2c2c2c, #1a1a1a) !important;
-}
-
-.app.dark-mode .popup-content {
-  background: rgba(0,0,0,0.9) !important;
-  color: #fff !important;
-}
-
-.app.dark-mode .history-list li {
-  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-}
-
-.app.dark-mode .history-list li:hover {
-  background: rgba(255,255,255,0.05) !important;
-}
-
-.app.dark-mode .sidebar {
-  background: rgba(0,0,0,0.9) !important;
-}
-
-.app.dark-mode .menu-content {
-  color: #fff !important;
-}
-
-.app.dark-mode .menu-content h2 {
-  color: #fff !important;
-  border-bottom: 1px solid rgba(255,255,255,0.3) !important;
-}
-
-.app.dark-mode .menu-content h3 {
-  color: #fff !important;
-}
-
-.app.dark-mode .menu-content h3:hover {
-  color: rgba(255,255,255,0.8) !important;
-}
-
-.app.dark-mode .menu-content section:hover {
-  background: rgba(255,255,255,0.1) !important;
-}
-
-.app.dark-mode .top-left h1,
-.app.dark-mode .top-left h2,
-.app.dark-mode .top-left p {
-  color: #fff !important;
-}
-
-.app.dark-mode .top-right .time,
-.app.dark-mode .top-right .date,
-.app.dark-mode .search-bar input {
-  color: #333 !important;
-}
-
-.app.dark-mode .search-bar {
-  background: rgba(255,255,255,0.9) !important;
-}
-
-.app.dark-mode .bottom-right {
-  color: #fff !important;
-}
-
-.app.dark-mode .bottom-right a {
-  color: #fff !important;
-}
 
 /* Loading Animation */
 @keyframes loadingDots {
@@ -1289,7 +612,7 @@ body {
   font-size: 2.5rem;
   font-weight: bold;
   animation: fadeIn 0.5s ease-in;
-  color: #fff;
+  color: var(--loading-text);
 }
 
 @keyframes fadeIn {
@@ -1299,13 +622,13 @@ body {
 
 /* Forecast Loading */
 .forecast-loading {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--forecast-bg);
   border-radius: 12px;
   padding: 30px;
   text-align: center;
   min-width: 130px;
   backdrop-filter: blur(5px);
-  color: #fff;
+  color: var(--forecast-text);
 }
 
 .forecast-loading .loading-text {

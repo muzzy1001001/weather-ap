@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import "./index.css";
 import Switch from "./components/Switch";
 
@@ -29,7 +28,10 @@ function App() {
   const [showPopup, setShowPopup] = useState(false); // for recent searches popup
   const [loadingMessage, setLoadingMessage] = useState(null); // for loading steps
   const [isClearing, setIsClearing] = useState(false); // for clear animation
-  const [darkMode, setDarkMode] = useState(false); // for dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  }); // for dark mode
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -225,7 +227,11 @@ function App() {
 
         {/* THEME TOGGLE */}
         <div className="theme-toggle">
-          <Switch checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
+          <Switch checked={darkMode} onChange={(e) => {
+            const newMode = e.target.checked;
+            setDarkMode(newMode);
+            localStorage.setItem('darkMode', JSON.stringify(newMode));
+          }} />
         </div>
 
         {/* TOP LEFT - Weather Info */}
@@ -241,9 +247,7 @@ function App() {
             <>
               <div className="temp-row">
                 <h1 className="temperature">{weather.temperature}</h1>
-                <motion.img
-                  animate={{ scale: [0.9, 1, 0.9] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                <img
                   src={getWeatherIcon(weather.description)}
                   alt="weather icon"
                   className="weather-icon"
