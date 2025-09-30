@@ -16,19 +16,18 @@ app.get("/", (req, res) => {
 
 // Add history
 app.post("/history", async (req, res) => {
-  const { city } = req.body;
-  console.log("📩 Received in backend:", city); // 👈 debug
-
+  const { city, description } = req.body; // 👈 get both
   if (!city) return res.status(400).json({ error: "City required" });
 
   try {
-    await db.query("INSERT INTO history (city) VALUES (?)", [city]);
+    await db.query("INSERT INTO history (city, weather_description) VALUES (?, ?)", [city, description || ""]);
     res.status(201).json({ message: "Added to history" });
   } catch (err) {
     console.error("❌ DB Insert Error:", err);
     res.status(500).json({ error: "Failed to add history" });
   }
 });
+
 
 // Get history
 app.get("/history", async (req, res) => {

@@ -15,8 +15,176 @@ body {
 .app {
   width: 100%;
   height: 100%;
-  padding: 40px;
-  box-sizing: border-box;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 0;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar.open {
+  width: 300px;
+}
+
+.menu-content {
+  padding: 20px 15px;
+  color: white;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.menu-content h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 10px;
+}
+
+.menu-content section {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.menu-content section:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.menu-content h3 {
+  margin: 0 0 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.menu-content h3:hover {
+  color: rgba(255,255,255,0.8);
+}
+
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 15px;
+  max-width: 700px;
+  width: 80vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  color: #333;
+}
+
+.popup-content h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-list li {
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  position: relative;
+  padding-right: 40px; /* space for button */
+}
+
+.history-list li:hover {
+  background: rgba(0,0,0,0.05);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 5px;
+}
+
+.clear-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.clear-btn-top {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+}
+
+.close-btn {
+  background: #666;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.fading-out {
+  animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Main content */
+.main {
+  flex: 1;
   display: grid;
   grid-template-areas:
     "left right"
@@ -24,6 +192,8 @@ body {
     "footer footer";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr auto;
+  padding: 40px;
+  box-sizing: border-box;
 }
 
 /* Background Themes */
@@ -38,6 +208,62 @@ body {
 }
 .cloudy-bg {
   background: linear-gradient(to bottom, #757f9a, #d7dde8);
+}
+
+/* MENU TOGGLE */
+.menu-toggle {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  padding: 12px 16px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+  color: white;
+  z-index: 1000;
+  transition: background 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* THEME TOGGLE */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  padding: 5px;
+  transition: background 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+.history-list li {
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 10px;
+}
+
+.clear-btn {
+  background: red;
+  border: none;
+  padding: 5px 10px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 /* TOP LEFT */
@@ -120,15 +346,23 @@ body {
 }
 
 .delete-btn {
-  background: transparent;
+  background: rgba(255,0,0,0.1);
   border: none;
-  color: red;
+  color: #d32f2f;
   cursor: pointer;
-  margin-left: 8px;
-  font-size: 1rem;
+  padding: 5px 10px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 .delete-btn:hover {
-  color: darkred;
+  background: rgba(255,0,0,0.2);
+  color: #b71c1c;
 }
 
 
@@ -234,6 +468,856 @@ body {
   padding: 20px 40px;
   opacity: 0.9;
 }
+
+/* DARK MODE */
+.app.dark-mode {
+  color: #fff !important;
+}
+
+.app.dark-mode * {
+  color: inherit !important;
+}
+
+/* Dark mode body */
+.app.dark-mode body {
+  color: #fff !important;
+}
+
+/* Dark mode html */
+.app.dark-mode html {
+  color: #fff !important;
+}
+
+/* Dark mode root */
+.app.dark-mode #root {
+  color: #fff !important;
+}
+
+/* Force dark mode styles */
+.app.dark-mode,
+.app.dark-mode *,
+.app.dark-mode *::before,
+.app.dark-mode *::after {
+  color: inherit !important;
+}
+
+/* Dark mode specific elements */
+.app.dark-mode .top-left,
+.app.dark-mode .top-right,
+.app.dark-mode .bottom-right {
+  color: #fff !important;
+}
+
+/* Dark mode menu toggle */
+.app.dark-mode .menu-toggle {
+  background: rgba(0,0,0,0.3) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .menu-toggle:hover {
+  background: rgba(0,0,0,0.5) !important;
+}
+
+/* Dark mode theme toggle */
+.app.dark-mode .theme-toggle {
+  background: rgba(0,0,0,0.3) !important;
+}
+
+.app.dark-mode .theme-toggle:hover {
+  background: rgba(0,0,0,0.5) !important;
+}
+
+/* Dark mode loading text */
+.app.dark-mode .loading-text {
+  color: #fff !important;
+}
+
+/* Dark mode error text */
+.app.dark-mode .tagline {
+  color: #fff !important;
+}
+
+/* Dark mode main loading text */
+.app.dark-mode .loading-text {
+  color: #fff !important;
+}
+
+/* Dark mode main loading text */
+.app.dark-mode .loading-text {
+  color: #fff !important;
+}
+
+/* Dark mode menu toggle */
+.app.dark-mode .menu-toggle {
+  background: rgba(0,0,0,0.4) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .menu-toggle:hover {
+  background: rgba(0,0,0,0.6) !important;
+}
+
+/* Dark mode theme toggle */
+.app.dark-mode .theme-toggle {
+  background: rgba(0,0,0,0.4) !important;
+}
+
+.app.dark-mode .theme-toggle:hover {
+  background: rgba(0,0,0,0.6) !important;
+}
+
+/* Dark mode transitions */
+.app.dark-mode,
+.app.dark-mode * {
+  transition: all 0.3s ease !important;
+}
+
+/* Dark mode menu toggle button */
+.app.dark-mode .menu-toggle {
+  background: rgba(0,0,0,0.4) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .menu-toggle:hover {
+  background: rgba(0,0,0,0.6) !important;
+}
+
+/* Dark mode theme toggle button */
+.app.dark-mode .theme-toggle {
+  background: rgba(0,0,0,0.4) !important;
+}
+
+.app.dark-mode .theme-toggle:hover {
+  background: rgba(0,0,0,0.6) !important;
+}
+
+/* Dark mode transitions */
+.app.dark-mode,
+.app.dark-mode * {
+  transition: all 0.3s ease !important;
+}
+
+/* Dark mode body */
+.app.dark-mode body {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode body */
+.app.dark-mode body {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode html */
+.app.dark-mode html {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode html */
+.app.dark-mode html {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode root */
+.app.dark-mode #root {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode root */
+.app.dark-mode #root {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode app container */
+.app.dark-mode .app {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode app container */
+.app.dark-mode .app {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode main content */
+.app.dark-mode .main {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode main content */
+.app.dark-mode .main {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode grid areas */
+.app.dark-mode .top-left,
+.app.dark-mode .top-right,
+.app.dark-mode .bottom-right {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode grid areas */
+.app.dark-mode .top-left,
+.app.dark-mode .top-right,
+.app.dark-mode .bottom-right {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode datetime */
+.app.dark-mode .datetime {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode datetime */
+.app.dark-mode .datetime {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode location */
+.app.dark-mode .location {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temp row */
+.app.dark-mode .temp-row {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temperature */
+.app.dark-mode .temperature {
+  color: #fff !important;
+}
+
+/* Dark mode search bar */
+.app.dark-mode .search-bar {
+  background: rgba(255,255,255,0.9) !important;
+}
+
+.app.dark-mode .search-bar input {
+  background: transparent !important;
+  color: #333 !important;
+}
+
+/* Dark mode location */
+.app.dark-mode .location {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temp row */
+.app.dark-mode .temp-row {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temperature */
+.app.dark-mode .temperature {
+  color: #fff !important;
+}
+
+/* Dark mode search bar */
+.app.dark-mode .search-bar {
+  background: rgba(255,255,255,0.9) !important;
+}
+
+.app.dark-mode .search-bar input {
+  background: transparent !important;
+  color: #333 !important;
+}
+
+/* Dark mode search icon */
+.app.dark-mode .search-icon {
+  filter: invert(1) !important;
+}
+
+/* Dark mode location icon */
+.app.dark-mode .location-icon {
+  filter: invert(1) !important;
+}
+
+/* Dark mode weather icons */
+.app.dark-mode .weather-icon,
+.app.dark-mode .forecast-icon {
+  filter: invert(1) brightness(0.8) !important;
+}
+
+/* Dark mode forecast cards */
+.app.dark-mode .forecast-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .forecast-card p {
+  color: #fff !important;
+}
+
+/* Dark mode forecast hover */
+.app.dark-mode .forecast-card:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Dark mode sidebar */
+.app.dark-mode .sidebar {
+  background: rgba(0,0,0,0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Dark mode menu content */
+.app.dark-mode .menu-content {
+  color: #fff !important;
+}
+
+/* Dark mode menu h2 */
+.app.dark-mode .menu-content h2 {
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.4) !important;
+}
+
+/* Dark mode menu h3 */
+.app.dark-mode .menu-content h3 {
+  color: #fff !important;
+}
+
+/* Dark mode menu section */
+.app.dark-mode .menu-content section {
+  background: transparent !important;
+}
+
+/* Dark mode menu section hover */
+.app.dark-mode .menu-content section:hover {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+/* Dark mode menu h3 hover */
+.app.dark-mode .menu-content h3:hover {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+/* Dark mode popup overlay */
+.app.dark-mode .popup-overlay {
+  background: rgba(0,0,0,0.7) !important;
+}
+
+/* Dark mode popup content */
+.app.dark-mode .popup-content {
+  background: rgba(0,0,0,0.95) !important;
+  color: #fff !important;
+}
+
+/* Dark mode popup h2 */
+.app.dark-mode .popup-content h2 {
+  color: #fff !important;
+}
+
+/* Dark mode history list */
+.app.dark-mode .history-list li {
+  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .history-list li strong {
+  color: #fff !important;
+}
+
+.app.dark-mode .history-list li em {
+  color: #ccc !important;
+}
+
+/* Dark mode history list hover */
+.app.dark-mode .history-list li:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* Dark mode close button */
+.app.dark-mode .close-btn {
+  background: #555 !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .close-btn:hover {
+  background: #777 !important;
+}
+
+/* Dark mode clear button */
+.app.dark-mode .clear-btn-top {
+  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
+  color: #fff !important;
+}
+
+/* Dark mode delete button */
+.app.dark-mode .delete-btn {
+  background: rgba(255,0,0,0.25) !important;
+  color: #ff8a80 !important;
+}
+
+.app.dark-mode .delete-btn:hover {
+  background: rgba(255,0,0,0.35) !important;
+  color: #ff6659 !important;
+}
+
+/* Dark mode forecast loading */
+.app.dark-mode .forecast-loading {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .forecast-loading .loading-text {
+  color: #fff !important;
+}
+
+/* Dark mode no recent searches */
+.app.dark-mode .popup-content p {
+  color: #ddd !important;
+}
+
+/* Dark mode error text */
+.app.dark-mode .tagline {
+  color: #fff !important;
+}
+
+/* Dark mode location icon */
+.app.dark-mode .location-icon {
+  filter: invert(1) !important;
+}
+
+/* Dark mode search icon */
+.app.dark-mode .search-icon {
+  filter: invert(1) !important;
+}
+
+/* Dark mode weather icons */
+.app.dark-mode .weather-icon,
+.app.dark-mode .forecast-icon {
+  filter: invert(1) brightness(0.8) !important;
+}
+
+/* Dark mode close button */
+.app.dark-mode .close-btn {
+  background: #444 !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .close-btn:hover {
+  background: #666 !important;
+}
+
+/* Dark mode clear button */
+.app.dark-mode .clear-btn,
+.app.dark-mode .clear-btn-top {
+  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
+  color: #fff !important;
+}
+
+/* Dark mode delete button */
+.app.dark-mode .delete-btn {
+  background: rgba(255,0,0,0.2) !important;
+  color: #ff6b6b !important;
+}
+
+.app.dark-mode .delete-btn:hover {
+  background: rgba(255,0,0,0.3) !important;
+  color: #ff5252 !important;
+}
+
+/* Dark mode forecast loading */
+.app.dark-mode .forecast-loading {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+/* Dark mode no recent searches */
+.app.dark-mode .popup-content p {
+  color: #ccc !important;
+}
+
+/* Dark mode transitions */
+.app.dark-mode,
+.app.dark-mode * {
+  transition: background 0.3s ease, color 0.3s ease, filter 0.3s ease !important;
+}
+
+/* Ensure dark mode styles override everything */
+.app.dark-mode {
+  background: #000 !important;
+}
+
+/* Force dark mode on all elements */
+.app.dark-mode,
+.app.dark-mode *,
+.app.dark-mode *::before,
+.app.dark-mode *::after {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Override body styles in dark mode */
+.app.dark-mode body {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Override html styles in dark mode */
+.app.dark-mode html {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Override root styles in dark mode */
+.app.dark-mode #root {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode app container */
+.app.dark-mode .app {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode main content */
+.app.dark-mode .main {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode grid areas */
+.app.dark-mode .top-left,
+.app.dark-mode .top-right,
+.app.dark-mode .bottom-right {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode datetime */
+.app.dark-mode .datetime {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode location */
+.app.dark-mode .location {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temp row */
+.app.dark-mode .temp-row {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Dark mode temperature */
+.app.dark-mode .temperature {
+  color: #fff !important;
+}
+
+/* Dark mode search bar background */
+.app.dark-mode .search-bar {
+  background: rgba(255,255,255,0.9) !important;
+}
+
+/* Dark mode search bar input */
+.app.dark-mode .search-bar input {
+  background: transparent !important;
+  color: #333 !important;
+}
+
+/* Dark mode forecast cards */
+.app.dark-mode .forecast-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .forecast-card p {
+  color: #fff !important;
+}
+
+/* Dark mode forecast icons */
+.app.dark-mode .forecast-icon {
+  filter: invert(1) brightness(0.8) !important;
+}
+
+/* Dark mode hover effects */
+.app.dark-mode .forecast-card:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Dark mode menu section hover */
+.app.dark-mode .menu-content section:hover {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+/* Dark mode menu h3 hover */
+.app.dark-mode .menu-content h3:hover {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+/* Dark mode menu h2 */
+.app.dark-mode .menu-content h2 {
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.4) !important;
+}
+
+/* Dark mode menu h3 */
+.app.dark-mode .menu-content h3 {
+  color: #fff !important;
+}
+
+/* Dark mode menu section */
+.app.dark-mode .menu-content section {
+  background: transparent !important;
+}
+
+/* Dark mode sidebar */
+.app.dark-mode .sidebar {
+  background: rgba(0,0,0,0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Dark mode popup overlay */
+.app.dark-mode .popup-overlay {
+  background: rgba(0,0,0,0.7) !important;
+}
+
+/* Dark mode popup content */
+.app.dark-mode .popup-content {
+  background: rgba(0,0,0,0.95) !important;
+  color: #fff !important;
+}
+
+/* Dark mode popup h2 */
+.app.dark-mode .popup-content h2 {
+  color: #fff !important;
+}
+
+/* Dark mode history list items */
+.app.dark-mode .history-list li {
+  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .history-list li strong {
+  color: #fff !important;
+}
+
+.app.dark-mode .history-list li em {
+  color: #ccc !important;
+}
+
+/* Dark mode history list hover */
+.app.dark-mode .history-list li:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* Dark mode close button */
+.app.dark-mode .close-btn {
+  background: #555 !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .close-btn:hover {
+  background: #777 !important;
+}
+
+/* Dark mode clear button top */
+.app.dark-mode .clear-btn-top {
+  background: linear-gradient(45deg, #d32f2f, #b71c1c) !important;
+  color: #fff !important;
+}
+
+/* Dark mode delete button */
+.app.dark-mode .delete-btn {
+  background: rgba(255,0,0,0.25) !important;
+  color: #ff8a80 !important;
+}
+
+.app.dark-mode .delete-btn:hover {
+  background: rgba(255,0,0,0.35) !important;
+  color: #ff6659 !important;
+}
+
+/* Dark mode forecast loading */
+.app.dark-mode .forecast-loading {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .forecast-loading .loading-text {
+  color: #fff !important;
+}
+
+/* Dark mode no recent searches text */
+.app.dark-mode .popup-content p {
+  color: #ddd !important;
+}
+
+/* Dark mode error text */
+.app.dark-mode .tagline {
+  color: #fff !important;
+}
+
+/* Dark mode search bar */
+.app.dark-mode .search-bar {
+  background: rgba(255,255,255,0.9) !important;
+}
+
+.app.dark-mode .search-bar input {
+  color: #333 !important;
+}
+
+/* Dark mode forecast cards */
+.app.dark-mode .forecast-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .forecast-card p {
+  color: #fff !important;
+}
+
+.app.dark-mode .default-bg {
+  background: linear-gradient(to right, #1a1a1a, #2d2d2d) !important;
+}
+
+.app.dark-mode .sunny-bg {
+  background: linear-gradient(to bottom, #2c1810, #1a0f0a) !important;
+}
+
+.app.dark-mode .rainy-bg {
+  background: linear-gradient(to bottom, #0f1419, #1a2332) !important;
+}
+
+.app.dark-mode .cloudy-bg {
+  background: linear-gradient(to bottom, #2c2c2c, #1a1a1a) !important;
+}
+
+.app.dark-mode .popup-content {
+  background: rgba(0,0,0,0.9) !important;
+  color: #fff !important;
+}
+
+.app.dark-mode .history-list li {
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.app.dark-mode .history-list li:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+
+.app.dark-mode .sidebar {
+  background: rgba(0,0,0,0.9) !important;
+}
+
+.app.dark-mode .menu-content {
+  color: #fff !important;
+}
+
+.app.dark-mode .menu-content h2 {
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.3) !important;
+}
+
+.app.dark-mode .menu-content h3 {
+  color: #fff !important;
+}
+
+.app.dark-mode .menu-content h3:hover {
+  color: rgba(255,255,255,0.8) !important;
+}
+
+.app.dark-mode .menu-content section:hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
+.app.dark-mode .top-left h1,
+.app.dark-mode .top-left h2,
+.app.dark-mode .top-left p {
+  color: #fff !important;
+}
+
+.app.dark-mode .top-right .time,
+.app.dark-mode .top-right .date,
+.app.dark-mode .search-bar input {
+  color: #333 !important;
+}
+
+.app.dark-mode .search-bar {
+  background: rgba(255,255,255,0.9) !important;
+}
+
+.app.dark-mode .bottom-right {
+  color: #fff !important;
+}
+
+.app.dark-mode .bottom-right a {
+  color: #fff !important;
+}
+
+/* Loading Animation */
+@keyframes loadingDots {
+  0%, 20% { content: ""; }
+  40% { content: "."; }
+  60% { content: ".."; }
+  80%, 100% { content: "..."; }
+}
+
+.loading-dots::after {
+  content: "";
+  animation: loadingDots 1.5s infinite;
+  font-weight: bold;
+}
+
+.loading-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  animation: fadeIn 0.5s ease-in;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Forecast Loading */
+.forecast-loading {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  min-width: 130px;
+  backdrop-filter: blur(5px);
+  color: #fff;
+}
+
+.forecast-loading .loading-text {
+  font-size: 1rem;
+  font-weight: bold;
+  animation: pulseScale 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
 .bottom-right a {
   color: #fff;
   text-decoration: underline;
@@ -242,6 +1326,10 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
   .app {
+    display: block; /* allow sidebar to be fixed */
+  }
+  .main {
+    display: grid;
     grid-template-areas:
       "left"
       "right"
@@ -273,5 +1361,28 @@ body {
   .bottom-right {
     text-align: center;
     padding: 15px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-right: none;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    z-index: 999;
+    transition: left 0.3s ease;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+
+  .popup-content {
+    max-width: 90%;
+    max-height: 90%;
   }
 }
