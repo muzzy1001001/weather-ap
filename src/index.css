@@ -64,7 +64,7 @@ html, body, #root {
   --forecast-bg: rgba(255, 255, 255, 0.1);
   --forecast-text: #fff;
   --location-icon-filter: invert(1);
-  --weather-icon-filter: invert(1) brightness(1.2) contrast(1.1);
+  --weather-icon-filter: none;
   --search-icon-filter: invert(1);
   --delete-btn-bg: rgba(255,0,0,0.25);
   --delete-btn-text: #ff8a80;
