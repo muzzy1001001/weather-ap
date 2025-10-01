@@ -1,40 +1,21 @@
-import mysql from 'mysql2/promise';
-import fs from 'fs';
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY; // Use service role for schema changes if available
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 const initDb = async () => {
-  let connection;
   try {
-    // Connect without specifying database first
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-    });
-
-    // Create database if it doesn't exist
-    await connection.query('CREATE DATABASE IF NOT EXISTS weather_app');
-    await connection.query('USE weather_app');
-
-    // Create tables
-    const schema = fs.readFileSync('schema.sql', 'utf8');
-    const statements = schema.split(';').filter(stmt => stmt.trim());
-
-    for (const statement of statements) {
-      if (statement.trim()) {
-        await connection.query(statement);
-      }
-    }
-
-    console.log('✅ Database and tables initialized successfully!');
+    // Note: For Supabase, tables are typically created via the dashboard SQL editor or migrations.
+    // This script is for reference. Run the schema.sql in Supabase dashboard.
+    console.log('ℹ️  For Supabase, please run the schema.sql in the Supabase dashboard SQL editor to create tables.');
+    console.log('✅ Initialization check complete. Ensure tables exist in Supabase.');
   } catch (error) {
-    console.error('❌ Error initializing database:', error);
-  } finally {
-    if (connection) {
-      connection.end();
-    }
+    console.error('❌ Error during initialization:', error);
   }
 };
 

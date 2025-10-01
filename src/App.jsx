@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./index.css";
 import Switch from "./components/Switch";
+import Loader from "./components/Loader";
+import PhotoGallery from "./components/PhotoGallery";
 
 // Import icons
 import locationIcon from "./assets/location.png";
@@ -40,6 +42,8 @@ function App() {
   const [editingNoteId, setEditingNoteId] = useState(null); // for editing notes
   const [editNoteText, setEditNoteText] = useState(""); // for edit note text
   const [activeNoteId, setActiveNoteId] = useState(null); // for showing action buttons on clicked note
+  const [noteImages, setNoteImages] = useState({}); // for images per note
+  const [cityPhotos, setCityPhotos] = useState([]); // for current city photos
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -120,13 +124,38 @@ function App() {
     }
   };
 
+  // ------------------ FETCH IMAGES FOR NOTES ------------------
+  const fetchNoteImages = async (noteIds) => {
+    const images = {};
+    for (const noteId of noteIds) {
+      try {
+        const res = await fetch(`http://localhost:5000/notes/${noteId}/images`);
+        const data = await res.json();
+        images[noteId] = data.images || [];
+      } catch (err) {
+        console.error(`Error fetching images for note ${noteId}:`, err);
+        images[noteId] = [];
+      }
+    }
+    setNoteImages(images);
+  };
+
+  // ------------------ FETCH PHOTOS FOR CITY ------------------
+  const fetchCityPhotos = async (cityName) => {
+    try {
+      const res = await fetch(`http://localhost:5000/cities/${encodeURIComponent(cityName)}/photos`);
+      const data = await res.json();
+      setCityPhotos(data.photos || []);
+    } catch (err) {
+      console.error(`Error fetching photos for city ${cityName}:`, err);
+      setCityPhotos([]);
+    }
+  };
+
   // ------------------ LOAD WEATHER + HISTORY ------------------
   useEffect(() => {
     if (!city) return;
     const loadWeatherAndHistory = async () => {
-      setLoadingMessage("Loading.....");
-      await new Promise(resolve => setTimeout(resolve, 500)); // shorter loading delay
-
       setLoadingMessage("Fetching weather data....");
       const weatherData = await fetchWeather(city);
       setLoadingMessage(null);
@@ -135,11 +164,19 @@ function App() {
       try {
         const res = await fetch(`http://localhost:5000/notes/${city}`);
         const data = await res.json();
-        setNotes(data.notes || []);
+        const fetchedNotes = data.notes || [];
+        setNotes(fetchedNotes);
+        // Fetch images for these notes
+        if (fetchedNotes.length > 0) {
+          await fetchNoteImages(fetchedNotes.map(note => note.id));
+        }
       } catch (err) {
         console.error("Error fetching notes:", err);
         setNotes([]); // reset if fetch fails
       }
+
+      // Fetch city photos
+      await fetchCityPhotos(city);
 
       try {
         // Save to backend search history (skip default city on first load)
@@ -435,7 +472,7 @@ function App() {
               <p className="tagline">Did you misspell it? Try again.</p>
             </>
           ) : loadingMessage ? (
-            <h2 className="loading-text">{loadingMessage}<span className="loading-dots"></span></h2>
+            <Loader darkMode={darkMode} />
           ) : weather ? (
             <>
               <div className="temp-row">
@@ -457,47 +494,120 @@ function App() {
                 {notes.length > 0 && (
                   <div className="notes-row">
                     {notes.map(note => (
-                      <div key={note.id} className="note-chip">
-                        <span
-                          onClick={() => setActiveNoteId(activeNoteId === note.id ? null : note.id)}
-                          style={{ cursor: 'pointer', display: 'block' }}
-                        >
-                          {note.note}
-                        </span>
-                        {activeNoteId === note.id && (
-                          <div className="action-buttons">
-                            <button
-                              className="delete-btn"
-                              onClick={async () => {
-                                if (window.confirm('Are you sure you want to delete this note?')) {
-                                  try {
-                                    await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
-                                    // Refresh notes
-                                    const res = await fetch(`http://localhost:5000/notes/${city}`);
-                                    const data = await res.json();
-                                    setNotes(data.notes || []);
-                                    fetchAllNotes(); // Also refresh all notes for sidebar
-                                    setActiveNoteId(null);
-                                  } catch (err) {
-                                    console.error("Error deleting note:", err);
+                      <div key={note.id} className="note-container">
+                        <div className="note-chip">
+                          <span
+                            onClick={() => setActiveNoteId(activeNoteId === note.id ? null : note.id)}
+                            style={{ cursor: 'pointer', display: 'block' }}
+                          >
+                            {note.note}
+                          </span>
+                          {activeNoteId === note.id && (
+                            <div className="action-buttons">
+                              <button
+                                className="delete-btn"
+                                onClick={async () => {
+                                  if (window.confirm('Are you sure you want to delete this note?')) {
+                                    try {
+                                      await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                                      // Refresh notes
+                                      const res = await fetch(`http://localhost:5000/notes/${city}`);
+                                      const data = await res.json();
+                                      setNotes(data.notes || []);
+                                      fetchAllNotes(); // Also refresh all notes for sidebar
+                                      setActiveNoteId(null);
+                                    } catch (err) {
+                                      console.error("Error deleting note:", err);
+                                    }
                                   }
-                                }
-                              }}
-                              title="Delete note"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        )}
+                                }}
+                                title="Delete note"
+                              >
+                                ×
+                              </button>
+                              <button
+                                className="edit-btn"
+                                onClick={() => {
+                                  // Simple inline edit: prompt for new text
+                                  const newText = prompt('Edit note:', note.note);
+                                  if (newText && newText.trim() && newText !== note.note) {
+                                    // Update the note
+                                    fetch(`http://localhost:5000/notes/${note.id}`, {
+                                      method: "PUT",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ note: newText.trim() }),
+                                    })
+                                    .then(() => {
+                                      // Refresh notes
+                                      fetch(`http://localhost:5000/notes/${city}`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                          setNotes(data.notes || []);
+                                          fetchAllNotes();
+                                          setActiveNoteId(null);
+                                        });
+                                    })
+                                    .catch(err => console.error("Error updating note:", err));
+                                  }
+                                }}
+                                title="Edit note"
+                              >
+                                ✏️
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
+
+
                 <button className="add-note-btn" onClick={() => setShowAddNotePopup(true)}>+ Note</button>
               </div>
             </>
-          ) : (
-            <p>Loading...</p>
+          ) : null}
+
+          {/* CITY PHOTO GALLERY - BELOW NOTES */}
+          {weather && (
+            <div className="city-photo-section">
+              <p className="photo-prompt">Share photos of {city}</p>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files);
+                  for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('photo', file);
+                    try {
+                      await fetch(`http://localhost:5000/cities/${encodeURIComponent(city)}/photos`, {
+                        method: 'POST',
+                        body: formData,
+                      });
+                    } catch (err) {
+                      console.error('Error uploading photo:', err);
+                    }
+                  }
+                  // Refresh photos
+                  await fetchCityPhotos(city);
+                  e.target.value = ''; // Reset input
+                }}
+                className="photo-upload"
+              />
+              <PhotoGallery
+                photos={cityPhotos}
+                onDelete={async (photoId) => {
+                  try {
+                    await fetch(`http://localhost:5000/photos/${photoId}`, { method: 'DELETE' });
+                    await fetchCityPhotos(city);
+                  } catch (err) {
+                    console.error('Error deleting photo:', err);
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
 
@@ -540,14 +650,7 @@ function App() {
 
           {/* Forecast */}
           <div className="forecast">
-            {loadingMessage ? (
-              // Show loading placeholders
-              [1, 2, 3].map((day) => (
-                <div key={day} className="forecast-loading">
-                  <p className="loading-text">Loading...</p>
-                </div>
-              ))
-            ) : error || !forecast.length ? (
+            {error || !forecast.length ? (
               // Show error placeholders
               [1, 2, 3].map((day) => (
                 <div key={day} className="forecast-card">

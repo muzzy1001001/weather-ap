@@ -1,21 +1,18 @@
-import mysql from 'mysql2/promise';
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const insertTestData = async () => {
-  let connection;
-  try {
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-      database: process.env.DB_NAME || 'weather_app',
-    });
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const insertTestData = async () => {
+  try {
     console.log('🧪 Inserting test data...');
 
-    // Insert test notes for Davao City
+    // Insert test notes
     const testNotes = [
       { city: 'Davao City', note: 'Beautiful city with great food and friendly people!' },
       { city: 'Davao City', note: 'Remember to visit the Davao River next time.' },
@@ -23,26 +20,18 @@ const insertTestData = async () => {
       { city: 'Cebu City', note: 'Island paradise with amazing beaches.' }
     ];
 
-    for (const noteData of testNotes) {
-      await connection.execute(
-        'INSERT INTO notes (city, note) VALUES (?, ?)',
-        [noteData.city, noteData.note]
-      );
-      console.log(`✅ Inserted note for ${noteData.city}`);
-    }
+    const { error } = await supabase.from('notes').insert(testNotes);
+    if (error) throw error;
 
     console.log('🎉 Test data inserted successfully!');
 
     // Verify the data
-    const [rows] = await connection.execute('SELECT * FROM notes ORDER BY city, created_at DESC');
-    console.log('📋 Current notes in database:', rows);
+    const { data, error: fetchError } = await supabase.from('notes').select('*').order('city').order('created_at', { ascending: false });
+    if (fetchError) throw fetchError;
+    console.log('📋 Current notes in database:', data);
 
   } catch (error) {
     console.error('❌ Error inserting test data:', error);
-  } finally {
-    if (connection) {
-      connection.end();
-    }
   }
 };
 

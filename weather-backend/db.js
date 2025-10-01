@@ -1,13 +1,15 @@
-import mysql from "mysql2/promise";
+import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const db = await mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME || "weather_app"
-});
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-export default db;
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Missing Supabase environment variables");
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default supabase;

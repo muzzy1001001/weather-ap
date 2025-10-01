@@ -480,14 +480,18 @@ body {
 
 .note-chip .action-buttons {
   position: absolute;
-  top: -2px;
-  right: -8px;
+  top: -15px;
+  right: 1px;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 50px;
+  height: 20px;
 }
 
+.note-chip .edit-btn,
 .note-chip .delete-btn {
-  background: rgba(244, 67, 54, 0.95);
-  color: white;
   border: none;
   border-radius: 50%;
   width: 20px;
@@ -500,11 +504,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.note-chip .delete-btn {
+  margin-right: 2px;
+}
+
+.note-chip .delete-btn {
+  background: rgba(244, 67, 54, 0.95);
+  color: white;
 }
 
 .note-chip .delete-btn:hover {
   background: rgba(244, 67, 54, 1);
   box-shadow: 0 3px 8px rgba(244, 67, 54, 0.3);
+}
+
+.note-chip .edit-btn {
+  background: rgba(33, 150, 243, 0.95);
+  color: white;
+}
+
+.note-chip .edit-btn:hover {
+  background: rgba(33, 150, 243, 1);
+  box-shadow: 0 3px 8px rgba(33, 150, 243, 0.3);
 }
 
 .add-note-btn {
@@ -522,6 +547,189 @@ body {
 .add-note-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Note Gallery */
+.note-container {
+  margin-bottom: 20px;
+}
+
+.note-gallery {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.gallery-prompt {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  text-align: center;
+}
+
+.image-upload {
+  display: block;
+  margin: 0 auto 10px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.image-upload:focus {
+  outline: 2px solid rgba(33, 150, 243, 0.5);
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+}
+
+.delete-image-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover .delete-image-btn {
+  opacity: 1;
+}
+
+.delete-image-btn:hover {
+  background: rgba(244, 67, 54, 1);
+}
+
+/* City Photo Section */
+.city-photo-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+}
+
+.photo-prompt {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  opacity: 0.9;
+  text-align: center;
+  font-weight: 500;
+}
+
+.photo-upload {
+  display: block;
+  margin: 0 auto 12px;
+  padding: 10px 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.photo-upload:hover {
+  border-color: rgba(33, 150, 243, 0.6);
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.photo-upload:focus {
+  outline: 2px solid rgba(33, 150, 243, 0.5);
+  border-color: rgba(33, 150, 243, 0.7);
+}
+
+.city-photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.photo-item {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+  aspect-ratio: 1;
+}
+
+.photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.photo-item:hover .photo-image {
+  transform: scale(1.05);
+}
+
+.delete-photo-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.photo-item:hover .delete-photo-btn {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.delete-photo-btn:hover {
+  background: rgba(244, 67, 54, 1);
+  box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
 }
 
 
