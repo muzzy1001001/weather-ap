@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
+    "components": "^0.1.0",
     "framer-motion": "^12.23.22",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "styled": "^1.0.0",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {

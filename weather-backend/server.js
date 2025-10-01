@@ -52,6 +52,42 @@ app.delete("/history/:id", async (req, res) => {
   }
 });
 
+// Get notes for city
+app.get("/notes/:city", async (req, res) => {
+  const { city } = req.params;
+  try {
+    const [rows] = await db.query("SELECT * FROM notes WHERE city = ? ORDER BY created_at DESC", [city]);
+    res.json({ notes: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch notes" });
+  }
+});
+
+// Add note for city
+app.post("/notes", async (req, res) => {
+  const { city, note } = req.body;
+  try {
+    await db.query("INSERT INTO notes (city, note) VALUES (?, ?)", [city, note]);
+    res.json({ message: "Note added" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to add note" });
+  }
+});
+
+// Delete note
+app.delete("/notes/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query("DELETE FROM notes WHERE id = ?", [id]);
+    res.json({ message: "Note deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete note" });
+  }
+});
+
 // Server start
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

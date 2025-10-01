@@ -32,6 +32,9 @@ function App() {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   }); // for dark mode
+  const [notes, setNotes] = useState([]); // for place notes
+  const [showNotePopup, setShowNotePopup] = useState(false); // for notes popup
+  const [newNote, setNewNote] = useState(""); // for new note input
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -53,7 +56,7 @@ function App() {
       const data = await res.json();
 
       if (!data.temperature) {
-        setError("City does not exist");
+        setError("Location does not exist");
         return;
       }
 
@@ -104,14 +107,26 @@ function App() {
       await fetchWeather(city);
       setLoadingMessage(null);
 
+      // Fetch place notes
       try {
-        // Save to backend search history
-        await fetch("http://localhost:5000/history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ city }),
-        });
-        fetchHistory(); // refresh after saving
+        const res = await fetch(`http://localhost:5000/notes/${city}`);
+        const data = await res.json();
+        setNotes(data.notes || []);
+      } catch (err) {
+        console.error("Error fetching notes:", err);
+        setNotes([]); // reset if fetch fails
+      }
+
+      try {
+        // Save to backend search history (skip default city)
+        if (city !== "Davao City") {
+          await fetch("http://localhost:5000/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ city, description: weather?.description }),
+          });
+          fetchHistory(); // refresh after saving
+        }
       } catch (err) {
         console.error("Error saving history:", err);
       }
@@ -149,9 +164,8 @@ function App() {
           </section>
 
           {/* PLACE NOTES */}
-          <section>
+          <section onClick={() => setShowNotePopup(true)}>
             <h3>Place Notes</h3>
-            <p>Coming soon...</p>
           </section>
 
           {/* ABOUT DEVELOPER */}
@@ -159,6 +173,17 @@ function App() {
             <h3>About Developer</h3>
             <p>Coming soon...</p>
           </section>
+
+          {/* THEME TOGGLE */}
+          <div className="theme-section">
+            <div className="sidebar-theme-toggle">
+              <Switch checked={darkMode} onChange={(e) => {
+                const newMode = e.target.checked;
+                setDarkMode(newMode);
+                localStorage.setItem('darkMode', JSON.stringify(newMode));
+              }} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -216,6 +241,75 @@ function App() {
         </div>
       )}
 
+      {/* PLACE NOTES POPUP */}
+      {showNotePopup && (
+        <div className="popup-overlay">
+          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Place Notes for {city}</h2>
+
+            {/* Existing Notes */}
+            {notes.length > 0 && (
+              <div style={{ marginBottom: '20px' }}>
+                <h3>Existing Notes:</h3>
+                {notes.map(note => (
+                  <div key={note.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '10px', background: 'rgba(0,0,0,0.1)', borderRadius: '5px' }}>
+                    <span>{note.note}</span>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                          // Refresh notes
+                          const res = await fetch(`http://localhost:5000/notes/${city}`);
+                          const data = await res.json();
+                          setNotes(data.notes || []);
+                        } catch (err) {
+                          console.error("Error deleting note:", err);
+                        }
+                      }}
+                      style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add New Note */}
+            <textarea
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder="Add a new note for this place..."
+              rows={4}
+              style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
+            />
+            <button
+              className="clear-btn"
+              onClick={async () => {
+                if (!newNote.trim()) return;
+                try {
+                  await fetch("http://localhost:5000/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ city, note: newNote }),
+                  });
+                  setNewNote("");
+                  // Refresh notes
+                  const res = await fetch(`http://localhost:5000/notes/${city}`);
+                  const data = await res.json();
+                  setNotes(data.notes || []);
+                } catch (err) {
+                  console.error("Error saving note:", err);
+                }
+              }}
+            >
+              Add Note
+            </button>
+            <button className="close-btn" onClick={() => setShowNotePopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
       {/* MAIN CONTENT */}
       <div className="main" onClick={() => menuOpen && setMenuOpen(false)}>
         {/* MENU TOGGLE BUTTON */}
@@ -224,15 +318,6 @@ function App() {
             ☰
           </button>
         )}
-
-        {/* THEME TOGGLE */}
-        <div className="theme-toggle">
-          <Switch checked={darkMode} onChange={(e) => {
-            const newMode = e.target.checked;
-            setDarkMode(newMode);
-            localStorage.setItem('darkMode', JSON.stringify(newMode));
-          }} />
-        </div>
 
         {/* TOP LEFT - Weather Info */}
         <div className="top-left">
@@ -259,6 +344,34 @@ function App() {
                 <img src={locationIcon} alt="location" className="location-icon" />{" "}
                 {city}
               </p>
+              <button className="add-note-btn" onClick={() => setShowNotePopup(true)}>+ Note</button>
+
+              {notes.length > 0 && (
+                <div className="place-notes-section">
+                  <h3>Place Notes:</h3>
+                  {notes.map(note => (
+                    <div key={note.id} className="place-note-item">
+                      {city} - {note.note}
+                      <button
+                        className="delete-note-btn"
+                        onClick={async () => {
+                          try {
+                            await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                            // Refresh notes
+                            const res = await fetch(`http://localhost:5000/notes/${city}`);
+                            const data = await res.json();
+                            setNotes(data.notes || []);
+                          } catch (err) {
+                            console.error("Error deleting note:", err);
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           ) : (
             <p>Loading...</p>
@@ -276,7 +389,7 @@ function App() {
             />
             <input
               type="text"
-              placeholder="Search city..."
+              placeholder="Search"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -285,13 +398,11 @@ function App() {
                     .split(" ")
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                     .join(" ");
-  
-                  const cityName = formatted.endsWith("City") ? formatted : `${formatted} City`;
-  
-                  console.log("📤 Sending to backend:", cityName); // 👈 debug line
-  
+
+                  console.log("📤 Sending to backend:", formatted); // 👈 debug line
+
                   setError(null); // clear previous error
-                  setCity(cityName);
+                  setCity(formatted);
                   setInput("");
                 }
               }}
