@@ -17,7 +17,7 @@ import "@fontsource/inter/700.css";
 
 function App() {
   // ------------------ STATE ------------------
-  const [city, setCity] = useState("Davao"); // default city
+  const [city, setCity] = useState("Davao City"); // default city
   const [weather, setWeather] = useState(null); // current weather
   const [forecast, setForecast] = useState([]); // forecast array
   const [input, setInput] = useState(""); // search input
@@ -32,9 +32,14 @@ function App() {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   }); // for dark mode
-  const [notes, setNotes] = useState([]); // for place notes
-  const [showNotePopup, setShowNotePopup] = useState(false); // for notes popup
+  const [notes, setNotes] = useState([]); // for current city notes
+  const [allNotes, setAllNotes] = useState([]); // for all notes across cities
+  const [showNotePopup, setShowNotePopup] = useState(false); // for placed notes popup (view/edit/delete)
+  const [showAddNotePopup, setShowAddNotePopup] = useState(false); // for add note popup
   const [newNote, setNewNote] = useState(""); // for new note input
+  const [editingNoteId, setEditingNoteId] = useState(null); // for editing notes
+  const [editNoteText, setEditNoteText] = useState(""); // for edit note text
+  const [activeNoteId, setActiveNoteId] = useState(null); // for showing action buttons on clicked note
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -57,7 +62,7 @@ function App() {
 
       if (!data.temperature) {
         setError("Location does not exist");
-        return;
+        return null;
       }
 
       setWeather(data);
@@ -69,9 +74,12 @@ function App() {
       else if (desc.includes("rain")) setBgClass("rainy-bg");
       else if (desc.includes("cloud")) setBgClass("cloudy-bg");
       else setBgClass("default-bg");
+
+      return data; // Return weather data
     } catch (err) {
       console.error("Error fetching weather:", err);
       setError("Failed to fetch weather");
+      return null;
     }
   };
 
@@ -96,6 +104,22 @@ function App() {
     }
   };
 
+  // ------------------ FETCH ALL NOTES ------------------
+  const fetchAllNotes = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/notes");
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      console.log("Fetched all notes:", data.notes); // Debug log
+      setAllNotes(data.notes || []);
+    } catch (err) {
+      console.error("Error fetching all notes:", err);
+      setAllNotes([]);
+    }
+  };
+
   // ------------------ LOAD WEATHER + HISTORY ------------------
   useEffect(() => {
     if (!city) return;
@@ -104,7 +128,7 @@ function App() {
       await new Promise(resolve => setTimeout(resolve, 500)); // shorter loading delay
 
       setLoadingMessage("Fetching weather data....");
-      await fetchWeather(city);
+      const weatherData = await fetchWeather(city);
       setLoadingMessage(null);
 
       // Fetch place notes
@@ -118,12 +142,12 @@ function App() {
       }
 
       try {
-        // Save to backend search history (skip default city)
-        if (city !== "Davao City") {
+        // Save to backend search history (skip default city on first load)
+        if (city !== "Davao City" && weatherData) {
           await fetch("http://localhost:5000/history", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ city, description: weather?.description }),
+            body: JSON.stringify({ city, description: weatherData.description || "Weather data" }),
           });
           fetchHistory(); // refresh after saving
         }
@@ -134,6 +158,12 @@ function App() {
 
     loadWeatherAndHistory();
   }, [city]); // run when city changes
+
+  // ------------------ FETCH ALL NOTES AND HISTORY ON MOUNT ------------------
+  useEffect(() => {
+    fetchAllNotes();
+    fetchHistory();
+  }, []);
 
   // ------------------ DATE & TIME ------------------
   const [dateTime, setDateTime] = useState(new Date());
@@ -163,10 +193,6 @@ function App() {
             <h3>Recent Searches</h3>
           </section>
 
-          {/* PLACE NOTES */}
-          <section onClick={() => setShowNotePopup(true)}>
-            <h3>Place Notes</h3>
-          </section>
 
           {/* ABOUT DEVELOPER */}
           <section>
@@ -241,77 +267,159 @@ function App() {
         </div>
       )}
 
-      {/* PLACE NOTES POPUP */}
+      {/* PLACED NOTES POPUP */}
       {showNotePopup && (
         <div className="popup-overlay">
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Place Notes for {city}</h2>
+            <h2>All Placed Notes</h2>
 
-            {/* Existing Notes */}
-            {notes.length > 0 && (
+            {/* All notes in a single list */}
+            {allNotes.length > 0 ? (
               <div style={{ marginBottom: '20px' }}>
-                <h3>Existing Notes:</h3>
-                {notes.map(note => (
-                  <div key={note.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '10px', background: 'rgba(0,0,0,0.1)', borderRadius: '5px' }}>
-                    <span>{note.note}</span>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
-                          // Refresh notes
-                          const res = await fetch(`http://localhost:5000/notes/${city}`);
-                          const data = await res.json();
-                          setNotes(data.notes || []);
-                        } catch (err) {
-                          console.error("Error deleting note:", err);
-                        }
-                      }}
-                      style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}
-                    >
-                      Delete
-                    </button>
+                {allNotes.map(note => (
+                  <div key={note.id} style={{ marginBottom: '15px', padding: '15px', background: 'rgba(0,0,0,0.05)', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}>
+                    {editingNoteId === note.id ? (
+                      <div>
+                        <textarea
+                          value={editNoteText}
+                          onChange={(e) => setEditNoteText(e.target.value)}
+                          rows={3}
+                          style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', marginBottom: '10px' }}
+                        />
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await fetch(`http://localhost:5000/notes/${note.id}`, {
+                                  method: "PUT",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ note: editNoteText }),
+                                });
+                                setEditingNoteId(null);
+                                setEditNoteText("");
+                                fetchAllNotes(); // Refresh all notes
+                              } catch (err) {
+                                console.error("Error updating note:", err);
+                              }
+                            }}
+                            style={{ background: 'green', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingNoteId(null);
+                              setEditNoteText("");
+                            }}
+                            style={{ background: 'gray', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>{note.note}</p>
+                        <small style={{ color: '#666', fontSize: '0.8rem' }}>
+                          📍 {note.city} • {new Date(note.created_at).toLocaleDateString()} {new Date(note.created_at).toLocaleTimeString()}
+                        </small>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                          <button
+                            onClick={() => {
+                              setEditingNoteId(note.id);
+                              setEditNoteText(note.note);
+                            }}
+                            style={{ background: 'blue', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                                fetchAllNotes(); // Refresh all notes
+                              } catch (err) {
+                                console.error("Error deleting note:", err);
+                              }
+                            }}
+                            style={{ background: 'red', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+            ) : (
+              <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic', margin: '40px 0' }}>
+                No notes found. Use the "+ Note" button to add notes for different cities!
+              </p>
             )}
 
+            <button className="close-btn" onClick={() => { setShowNotePopup(false); setEditingNoteId(null); setEditNoteText(""); }}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* ADD NOTE POPUP */}
+      {showAddNotePopup && (
+        <div className="popup-overlay">
+          <div className="popup-content add-note-popup" onClick={(e) => e.stopPropagation()}>
+            <h2>Notes for {city}</h2>
+
             {/* Add New Note */}
-            <textarea
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              placeholder="Add a new note for this place..."
-              rows={4}
-              style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
-            />
-            <button
-              className="clear-btn"
-              onClick={async () => {
-                if (!newNote.trim()) return;
-                try {
-                  await fetch("http://localhost:5000/notes", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ city, note: newNote }),
-                  });
-                  setNewNote("");
-                  // Refresh notes
-                  const res = await fetch(`http://localhost:5000/notes/${city}`);
-                  const data = await res.json();
-                  setNotes(data.notes || []);
-                } catch (err) {
-                  console.error("Error saving note:", err);
-                }
-              }}
-            >
-              Add Note
-            </button>
-            <button className="close-btn" onClick={() => setShowNotePopup(false)}>Close</button>
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ borderBottom: '2px solid #ddd', paddingBottom: '8px', marginBottom: '15px', color: '#333' }}>
+                Add New Note
+              </h3>
+              <textarea
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Enter your note..."
+                rows={4}
+                style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button className="close-btn" onClick={() => { setShowAddNotePopup(false); setNewNote(""); setEditingNoteId(null); setEditNoteText(""); }}>Close</button>
+              <button
+                className="clear-btn"
+                onClick={async () => {
+                  if (!newNote.trim()) return;
+                  try {
+                    await fetch("http://localhost:5000/notes", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ city, note: newNote }),
+                    });
+                    setNewNote("");
+                    setShowAddNotePopup(false);
+                    // Refresh notes
+                    const res = await fetch(`http://localhost:5000/notes/${city}`);
+                    const data = await res.json();
+                    setNotes(data.notes || []);
+                    fetchAllNotes(); // Also refresh all notes for sidebar
+                  } catch (err) {
+                    console.error("Error saving note:", err);
+                  }
+                }}
+              >
+                Add Note
+              </button>
+            </div>
+
           </div>
         </div>
       )}
 
       {/* MAIN CONTENT */}
-      <div className="main" onClick={() => menuOpen && setMenuOpen(false)}>
+      <div className="main" onClick={(e) => {
+        if (menuOpen) setMenuOpen(false);
+        if (activeNoteId) setActiveNoteId(null);
+      }}>
         {/* MENU TOGGLE BUTTON */}
         {!menuOpen && (
           <button className="menu-toggle" onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}>
@@ -344,34 +452,49 @@ function App() {
                 <img src={locationIcon} alt="location" className="location-icon" />{" "}
                 {city}
               </p>
-              <button className="add-note-btn" onClick={() => setShowNotePopup(true)}>+ Note</button>
 
-              {notes.length > 0 && (
-                <div className="place-notes-section">
-                  <h3>Place Notes:</h3>
-                  {notes.map(note => (
-                    <div key={note.id} className="place-note-item">
-                      {city} - {note.note}
-                      <button
-                        className="delete-note-btn"
-                        onClick={async () => {
-                          try {
-                            await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
-                            // Refresh notes
-                            const res = await fetch(`http://localhost:5000/notes/${city}`);
-                            const data = await res.json();
-                            setNotes(data.notes || []);
-                          } catch (err) {
-                            console.error("Error deleting note:", err);
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="notes-and-add-row">
+                {notes.length > 0 && (
+                  <div className="notes-row">
+                    {notes.map(note => (
+                      <div key={note.id} className="note-chip">
+                        <span
+                          onClick={() => setActiveNoteId(activeNoteId === note.id ? null : note.id)}
+                          style={{ cursor: 'pointer', display: 'block' }}
+                        >
+                          {note.note}
+                        </span>
+                        {activeNoteId === note.id && (
+                          <div className="action-buttons">
+                            <button
+                              className="delete-btn"
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this note?')) {
+                                  try {
+                                    await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                                    // Refresh notes
+                                    const res = await fetch(`http://localhost:5000/notes/${city}`);
+                                    const data = await res.json();
+                                    setNotes(data.notes || []);
+                                    fetchAllNotes(); // Also refresh all notes for sidebar
+                                    setActiveNoteId(null);
+                                  } catch (err) {
+                                    console.error("Error deleting note:", err);
+                                  }
+                                }
+                              }}
+                              title="Delete note"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button className="add-note-btn" onClick={() => setShowAddNotePopup(true)}>+ Note</button>
+              </div>
             </>
           ) : (
             <p>Loading...</p>

@@ -9,10 +9,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+console.log("🚀 Server starting up...");
+
 // Health check
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");
 });
+
+console.log("📝 Setting up routes...");
+
+// Test database connection
+try {
+  const testConnection = await db.query("SELECT 1");
+  console.log("✅ Database connection successful");
+} catch (dbErr) {
+  console.error("❌ Database connection failed:", dbErr);
+}
 
 // Add history
 app.post("/history", async (req, res) => {
@@ -52,11 +64,26 @@ app.delete("/history/:id", async (req, res) => {
   }
 });
 
+// Get all notes
+app.get("/notes", async (req, res) => {
+  console.log("GET /notes endpoint hit");
+  try {
+    const [rows] = await db.query("SELECT * FROM notes ORDER BY city, created_at DESC");
+    console.log("Fetched notes:", rows.length);
+    res.json({ notes: rows });
+  } catch (err) {
+    console.error("Error fetching notes:", err);
+    res.status(500).json({ error: "Failed to fetch notes" });
+  }
+});
+
+console.log("📋 Notes routes registered");
+
 // Get notes for city
 app.get("/notes/:city", async (req, res) => {
   const { city } = req.params;
   try {
-    const [rows] = await db.query("SELECT * FROM notes WHERE city = ? ORDER BY created_at DESC", [city]);
+    const [rows] = await db.query("SELECT * FROM notes WHERE LOWER(city) = LOWER(?) ORDER BY created_at DESC", [city]);
     res.json({ notes: rows });
   } catch (err) {
     console.error(err);
@@ -73,6 +100,19 @@ app.post("/notes", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to add note" });
+  }
+});
+
+// Update note
+app.put("/notes/:id", async (req, res) => {
+  const { id } = req.params;
+  const { note } = req.body;
+  try {
+    await db.query("UPDATE notes SET note = ? WHERE id = ?", [note, id]);
+    res.json({ message: "Note updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update note" });
   }
 });
 
