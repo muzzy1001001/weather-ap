@@ -10,7 +10,7 @@ html, body, #root {
 :root {
   --bg-color: #fff;
   --text-color: #000;
-  --sidebar-bg: rgba(255,255,255,0.95);
+  --sidebar-bg: rgba(255,255,255,0.7);
   --sidebar-border: rgba(255,255,255,0.3);
   --menu-text: #000;
   --menu-hover: rgba(0,0,0,0.1);
@@ -49,6 +49,7 @@ html, body, #root {
   --sunny-bg: linear-gradient(to bottom, #f9d423, #ff4e50);
   --rainy-bg: linear-gradient(to bottom, #4facfe, #00f2fe);
   --cloudy-bg: linear-gradient(to bottom, #757f9a, #d7dde8);
+  --snowy-bg: linear-gradient(to bottom, #e6f3ff, #b3d9ff);
   --clouds-color: #333;
   --back-clouds-color: #111;
 }
@@ -56,7 +57,7 @@ html, body, #root {
 .app.dark-mode {
   --bg-color: #000;
   --text-color: #fff;
-  --sidebar-bg: rgba(0,0,0,0.95);
+  --sidebar-bg: rgba(0,0,0,0.7);
   --sidebar-border: rgba(0,0,0,0.3);
   --menu-text: #fff;
   --menu-hover: rgba(255,255,255,0.15);
@@ -95,6 +96,7 @@ html, body, #root {
   --sunny-bg: linear-gradient(to bottom, #2c1810, #1a0f0a);
   --rainy-bg: linear-gradient(to bottom, #0f1419, #1a2332);
   --cloudy-bg: linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+  --snowy-bg: linear-gradient(to bottom, #1a1a2a, #2d2d3d);
   --clouds-color: #F3FDFF;
   --back-clouds-color: #AACADF;
 }
@@ -123,18 +125,23 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 0;
+  position: fixed;
+  left: -300px;
+  top: 0;
+  width: 300px;
+  height: 100%;
   background: var(--sidebar-bg);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border-right: 1px solid var(--sidebar-border);
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  transition: width 0.3s ease;
+  transition: left 0.3s ease;
   overflow: hidden;
+  z-index: 1000;
 }
 
 .sidebar.open {
-  width: 300px;
+  left: 0;
 }
 
 .menu-content {
@@ -206,10 +213,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 150;
 }
 
 .popup-content {
+  position: relative;
   background: var(--popup-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -237,6 +245,27 @@ body {
   overflow: visible !important;
   padding: 30px !important;
   padding-right: 50px !important;
+}
+
+.gallery-popup {
+  width: 90vw !important;
+  max-width: 1200px !important;
+  height: 80vh !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
+}
+
+.developer-popup {
+  width: 90vw !important;
+  max-width: 800px !important;
+  height: 85vh !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+  padding: 0 !important;
+  background: rgba(0,0,0,0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .add-note-popup h2 {
@@ -304,16 +333,67 @@ body {
   width: auto;
 }
 
-.close-btn {
+.close-btn-top {
+  position: absolute;
+  top: 10px;
+  left: 10px;
   background: var(--close-btn-bg);
   border: none;
-  padding: 10px 20px;
+  padding: 10px 15px;
   color: var(--button-text);
-  border-radius: 25px;
+  border-radius: 50%;
   cursor: pointer;
   font-weight: 600;
-  margin-top: 10px;
-  width: 100%;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.close-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--close-btn-bg);
+  border: none;
+  padding: 10px 15px;
+  color: var(--button-text);
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.close-btn-top {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  z-index: 3;
+}
+
+.close-btn-top:hover {
+  background: rgba(255, 0, 0, 1);
 }
 
 .fading-out {
@@ -333,11 +413,12 @@ body {
   display: grid;
   grid-template-areas:
     "left right"
-    "left right"
+    "photos right"
     "footer footer";
   grid-template-columns: minmax(450px, 1fr) 1fr;
   grid-template-rows: 1fr 1fr auto;
   padding: 40px;
+  margin-top: 100px;
   box-sizing: border-box;
 }
 
@@ -353,6 +434,9 @@ body {
 }
 .cloudy-bg {
   background: var(--cloudy-bg);
+}
+.snowy-bg {
+  background: var(--snowy-bg);
 }
 
 /* MENU TOGGLE */
@@ -444,10 +528,18 @@ body {
   filter: var(--location-icon-filter);
 }
 
-.notes-and-add-row {
+.location-and-note-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 5px;
+  gap: 15px;
+}
+
+.notes-and-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   margin-top: 15px;
   gap: 15px;
 }
@@ -456,7 +548,8 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  flex: 1;
+  margin-top: 15px;
+  align-content: flex-start;
 }
 
 .note-chip {
@@ -470,7 +563,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  min-height: 20px;
+  min-height: 10px;
 }
 
 .note-chip:hover {
@@ -542,6 +635,7 @@ body {
   font-size: 0.9rem;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .add-note-btn:hover {
@@ -551,7 +645,7 @@ body {
 
 /* Note Gallery */
 .note-container {
-  margin-bottom: 20px;
+  margin-bottom: 1px;
 }
 
 .note-gallery {
@@ -635,11 +729,16 @@ body {
 
 /* City Photo Section */
 .city-photo-section {
-  margin-top: 20px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
   padding: 15px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   backdrop-filter: blur(5px);
+  z-index: 10;
+  max-width: 300px;
+  margin-left: 50px;
 }
 
 .photo-prompt {
@@ -673,6 +772,7 @@ body {
   outline: 2px solid rgba(33, 150, 243, 0.5);
   border-color: rgba(33, 150, 243, 0.7);
 }
+
 
 .city-photo-gallery {
   display: grid;
@@ -1059,6 +1159,15 @@ body {
   .popup-content {
     max-width: 95%;
     max-height: 90%;
+  }
+
+  .notes-row {
+    gap: 6px;
+  }
+
+  .note-chip {
+    padding: 4px 8px;
+    font-size: 0.75rem;
   }
 
 }

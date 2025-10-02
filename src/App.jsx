@@ -3,6 +3,13 @@ import "./index.css";
 import Switch from "./components/Switch";
 import Loader from "./components/Loader";
 import PhotoGallery from "./components/PhotoGallery";
+import GalleryButton from "./components/GalleryButton";
+import Pattern from "./components/Pattern";
+import DeveloperCard from "./components/DeveloperCard";
+import ProgressLoader from "./components/ProgressLoader";
+import ForecastLoader from "./components/ForecastLoader";
+import lacandulaImage from "./assets/lacandula.png";
+import lopeImage from "./assets/lope.png";
 
 // Import icons
 import locationIcon from "./assets/location.png";
@@ -11,6 +18,7 @@ import cloudyIcon from "./assets/cloudy.png";
 import rainyIcon from "./assets/rainy.png";
 import windyIcon from "./assets/windy.png";
 import thunderIcon from "./assets/thunder.png";
+import snowIcon from "./assets/snow.png";
 
 // Fonts
 import "@fontsource/inter";
@@ -18,8 +26,8 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 
 function App() {
-  // ------------------ STATE ------------------
-  const [city, setCity] = useState("Davao City"); // default city
+   // ------------------ STATE ------------------
+   const [city, setCity] = useState("Davao City"); // default city
   const [weather, setWeather] = useState(null); // current weather
   const [forecast, setForecast] = useState([]); // forecast array
   const [input, setInput] = useState(""); // search input
@@ -44,6 +52,8 @@ function App() {
   const [activeNoteId, setActiveNoteId] = useState(null); // for showing action buttons on clicked note
   const [noteImages, setNoteImages] = useState({}); // for images per note
   const [cityPhotos, setCityPhotos] = useState([]); // for current city photos
+  const [showGalleryPopup, setShowGalleryPopup] = useState(false); // for gallery popup
+  const [showDeveloperPopup, setShowDeveloperPopup] = useState(false); // for developer popup
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -55,14 +65,26 @@ function App() {
     if (desc.includes("rain")) return rainyIcon;
     if (desc.includes("wind")) return windyIcon;
     if (desc.includes("thunder")) return thunderIcon;
+    if (desc.includes("snow")) return snowIcon;
     return cloudyIcon; // fallback
   };
 
   // ------------------ FETCH WEATHER ------------------
   const fetchWeather = async (cityName) => {
-    try {
-      const res = await fetch(`${API_URL}${cityName}`);
+    const tryFetch = async (name) => {
+      const res = await fetch(`${API_URL}${encodeURIComponent(name)}`);
       const data = await res.json();
+      return data;
+    };
+
+    try {
+      let data = await tryFetch(cityName);
+
+      // If no temperature, try without " City" suffix
+      if (!data.temperature && cityName.toLowerCase().endsWith(" city")) {
+        const altName = cityName.slice(0, -5).trim(); // Remove " City"
+        data = await tryFetch(altName);
+      }
 
       if (!data.temperature) {
         setError("Location does not exist");
@@ -77,6 +99,7 @@ function App() {
       if (desc.includes("sun") || desc.includes("clear")) setBgClass("sunny-bg");
       else if (desc.includes("rain")) setBgClass("rainy-bg");
       else if (desc.includes("cloud")) setBgClass("cloudy-bg");
+      else if (desc.includes("snow")) setBgClass("snowy-bg");
       else setBgClass("default-bg");
 
       return data; // Return weather data
@@ -231,10 +254,10 @@ function App() {
           </section>
 
 
-          {/* ABOUT DEVELOPER */}
-          <section>
-            <h3>About Developer</h3>
-            <p>Coming soon...</p>
+          {/* THE DEVELOPERS */}
+          <section onClick={() => setShowDeveloperPopup(true)}>
+            <h3>The Developers</h3>
+            <p>Click to view</p>
           </section>
 
           {/* THEME TOGGLE */}
@@ -254,12 +277,11 @@ function App() {
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn-top" onClick={() => setShowPopup(false)}>×</button>
             <h2>Recent Searches</h2>
             {history.length > 0 ? (
               isClearing ? (
-                <p style={{ textAlign: 'center', margin: '40px 0', color: '#666', fontStyle: 'italic' }}>
-                  Clearing....<span className="loading-dots"></span>
-                </p>
+                <ProgressLoader />
               ) : (
                 <>
                   <button
@@ -299,7 +321,64 @@ function App() {
             ) : (
               <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>No recent searches</p>
             )}
-            <button className="close-btn" onClick={() => setShowPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* GALLERY POPUP */}
+      {showGalleryPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content gallery-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn-top" onClick={() => setShowGalleryPopup(false)}>×</button>
+            <h2>Photo Gallery - {city}</h2>
+            <PhotoGallery
+              photos={cityPhotos}
+              onDelete={async (photoId) => {
+                try {
+                  await fetch(`http://localhost:5000/photos/${photoId}`, { method: 'DELETE' });
+                  await fetchCityPhotos(city);
+                } catch (err) {
+                  console.error('Error deleting photo:', err);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* DEVELOPER POPUP */}
+      {showDeveloperPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content developer-popup" onClick={(e) => e.stopPropagation()}>
+            <Pattern />
+            <div style={{ position: 'relative', zIndex: 2, padding: '20px', color: 'white' }}>
+              <button className="close-btn-top" onClick={() => setShowDeveloperPopup(false)}>×</button>
+              <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>The Developers</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
+                <DeveloperCard
+                  name=""
+                  role=""
+                  description=""
+                  bgImage={lacandulaImage}
+                  cornerColor="#ff4757"
+                  hoverText="Backend Developer"
+                  cardName="Christian Elle Lacandula"
+                />
+                <DeveloperCard
+                  name=""
+                  role=""
+                  description=""
+                  bgImage={lopeImage}
+                  cornerColor="#3742fa"
+                  hoverText="Frontend Developer"
+                  cardName="Rose Angelie Lope"
+                />
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '20px', color: 'white', paddingTop: '80px' }}>
+              <p>Built with React, Node.js, Express, and Supabase</p>
+              <p style={{ fontSize: '0.9rem', marginTop: '10px' }}>Thanks to the open-source community!</p>
+            </div>
           </div>
         </div>
       )}
@@ -485,90 +564,88 @@ function App() {
               </div>
               <h2>{city}</h2>
               <p>{weather.description}</p>
-              <p className="location">
-                <img src={locationIcon} alt="location" className="location-icon" />{" "}
-                {city}
-              </p>
-
-              <div className="notes-and-add-row">
-                {notes.length > 0 && (
-                  <div className="notes-row">
-                    {notes.map(note => (
-                      <div key={note.id} className="note-container">
-                        <div className="note-chip">
-                          <span
-                            onClick={() => setActiveNoteId(activeNoteId === note.id ? null : note.id)}
-                            style={{ cursor: 'pointer', display: 'block' }}
-                          >
-                            {note.note}
-                          </span>
-                          {activeNoteId === note.id && (
-                            <div className="action-buttons">
-                              <button
-                                className="delete-btn"
-                                onClick={async () => {
-                                  if (window.confirm('Are you sure you want to delete this note?')) {
-                                    try {
-                                      await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
-                                      // Refresh notes
-                                      const res = await fetch(`http://localhost:5000/notes/${city}`);
-                                      const data = await res.json();
-                                      setNotes(data.notes || []);
-                                      fetchAllNotes(); // Also refresh all notes for sidebar
-                                      setActiveNoteId(null);
-                                    } catch (err) {
-                                      console.error("Error deleting note:", err);
-                                    }
-                                  }
-                                }}
-                                title="Delete note"
-                              >
-                                ×
-                              </button>
-                              <button
-                                className="edit-btn"
-                                onClick={() => {
-                                  // Simple inline edit: prompt for new text
-                                  const newText = prompt('Edit note:', note.note);
-                                  if (newText && newText.trim() && newText !== note.note) {
-                                    // Update the note
-                                    fetch(`http://localhost:5000/notes/${note.id}`, {
-                                      method: "PUT",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({ note: newText.trim() }),
-                                    })
-                                    .then(() => {
-                                      // Refresh notes
-                                      fetch(`http://localhost:5000/notes/${city}`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                          setNotes(data.notes || []);
-                                          fetchAllNotes();
-                                          setActiveNoteId(null);
-                                        });
-                                    })
-                                    .catch(err => console.error("Error updating note:", err));
-                                  }
-                                }}
-                                title="Edit note"
-                              >
-                                ✏️
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-
+              <div className="location-and-note-row">
+                <p className="location">
+                  <img src={locationIcon} alt="location" className="location-icon" />{" "}
+                  {city}
+                </p>
                 <button className="add-note-btn" onClick={() => setShowAddNotePopup(true)}>+ Note</button>
               </div>
+
+              {notes.length > 0 && (
+                <div className="notes-row">
+                  {notes.map(note => (
+                    <div key={note.id} className="note-container">
+                      <div className="note-chip">
+                        <span
+                          onClick={() => setActiveNoteId(activeNoteId === note.id ? null : note.id)}
+                          style={{ cursor: 'pointer', display: 'block' }}
+                        >
+                          {note.note}
+                        </span>
+                        {activeNoteId === note.id && (
+                          <div className="action-buttons">
+                            <button
+                              className="delete-btn"
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this note?')) {
+                                  try {
+                                    await fetch(`http://localhost:5000/notes/${note.id}`, { method: "DELETE" });
+                                    // Refresh notes
+                                    const res = await fetch(`http://localhost:5000/notes/${city}`);
+                                    const data = await res.json();
+                                    setNotes(data.notes || []);
+                                    fetchAllNotes(); // Also refresh all notes for sidebar
+                                    setActiveNoteId(null);
+                                  } catch (err) {
+                                    console.error("Error deleting note:", err);
+                                  }
+                                }
+                              }}
+                              title="Delete note"
+                            >
+                              ×
+                            </button>
+                            <button
+                              className="edit-btn"
+                              onClick={() => {
+                                // Simple inline edit: prompt for new text
+                                const newText = prompt('Edit note:', note.note);
+                                if (newText && newText.trim() && newText !== note.note) {
+                                  // Update the note
+                                  fetch(`http://localhost:5000/notes/${note.id}`, {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ note: newText.trim() }),
+                                  })
+                                  .then(() => {
+                                    // Refresh notes
+                                    fetch(`http://localhost:5000/notes/${city}`)
+                                      .then(res => res.json())
+                                      .then(data => {
+                                        setNotes(data.notes || []);
+                                        fetchAllNotes();
+                                        setActiveNoteId(null);
+                                      });
+                                  })
+                                  .catch(err => console.error("Error updating note:", err));
+                                }
+                              }}
+                              title="Edit note"
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           ) : null}
 
-          {/* CITY PHOTO GALLERY - BELOW NOTES */}
+          {/* CITY PHOTO GALLERY - BOTTOM LEFT */}
           {weather && (
             <div className="city-photo-section">
               <p className="photo-prompt">Share photos of {city}</p>
@@ -596,17 +673,7 @@ function App() {
                 }}
                 className="photo-upload"
               />
-              <PhotoGallery
-                photos={cityPhotos}
-                onDelete={async (photoId) => {
-                  try {
-                    await fetch(`http://localhost:5000/photos/${photoId}`, { method: 'DELETE' });
-                    await fetchCityPhotos(city);
-                  } catch (err) {
-                    console.error('Error deleting photo:', err);
-                  }
-                }}
-              />
+              <GalleryButton onClick={() => setShowGalleryPopup(true)} bgClass={bgClass} />
             </div>
           )}
         </div>
@@ -650,7 +717,14 @@ function App() {
 
           {/* Forecast */}
           <div className="forecast">
-            {error || !forecast.length ? (
+            {loadingMessage ? (
+              // Show loading spinners during fetch
+              [1, 2, 3].map((day) => (
+                <div key={day} className="forecast-card">
+                  <ForecastLoader />
+                </div>
+              ))
+            ) : error || !forecast.length ? (
               // Show error placeholders
               [1, 2, 3].map((day) => (
                 <div key={day} className="forecast-card">

@@ -16,6 +16,11 @@ const upload = multer({ storage: storage });
 
 console.log("🚀 Server starting up...");
 
+// Normalize city name: lowercase and remove trailing " city"
+const normalizeCity = (city) => {
+  return city.toLowerCase().replace(/\s+city$/, '');
+};
+
 // Health check
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");

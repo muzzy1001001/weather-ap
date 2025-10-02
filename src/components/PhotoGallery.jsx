@@ -106,6 +106,13 @@ const PhotoGallery = ({ photos, onDelete }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal" onClick={closeModal}>×</button>
 
+            {photos.length > 1 && (
+              <>
+                <button className="nav-btn prev-btn" onClick={prevImage}>‹</button>
+                <button className="nav-btn next-btn" onClick={nextImage}>›</button>
+              </>
+            )}
+
             <div
               className="modal-image-container"
               onTouchStart={handleTouchStart}
@@ -116,15 +123,8 @@ const PhotoGallery = ({ photos, onDelete }) => {
                 alt={`Photo ${selectedIndex + 1}`}
                 className="modal-image"
               />
-              
-              {photos.length > 1 && (
-                <>
-                  <button className="nav-btn prev-btn" onClick={prevImage}>‹</button>
-                  <button className="nav-btn next-btn" onClick={nextImage}>›</button>
-                </>
-              )}
             </div>
-            
+
             <div className="modal-info">
               <span className="image-counter">
                 {selectedIndex + 1} of {photos.length}
