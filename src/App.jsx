@@ -8,6 +8,7 @@ import Pattern from "./components/Pattern";
 import DeveloperCard from "./components/DeveloperCard";
 import ProgressLoader from "./components/ProgressLoader";
 import ForecastLoader from "./components/ForecastLoader";
+import UploadLoader from "./components/UploadLoader";
 import lacandulaImage from "./assets/lacandula.png";
 import lopeImage from "./assets/lope.png";
 
@@ -54,6 +55,9 @@ function App() {
   const [cityPhotos, setCityPhotos] = useState([]); // for current city photos
   const [showGalleryPopup, setShowGalleryPopup] = useState(false); // for gallery popup
   const [showDeveloperPopup, setShowDeveloperPopup] = useState(false); // for developer popup
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false); // for photo upload loading
+  const [selectedPhotoFiles, setSelectedPhotoFiles] = useState([]); // for selected photo files
+  const [uploadComplete, setUploadComplete] = useState(false); // for upload completion message
 
   const API_URL = "https://goweather.herokuapp.com/weather/";
 
@@ -569,7 +573,10 @@ function App() {
                   <img src={locationIcon} alt="location" className="location-icon" />{" "}
                   {city}
                 </p>
-                <button className="add-note-btn" onClick={() => setShowAddNotePopup(true)}>+ Note</button>
+                <div className="action-buttons">
+                  <button className="add-note-btn" onClick={() => setShowAddNotePopup(true)}>+ Note</button>
+                  <GalleryButton onClick={() => setShowGalleryPopup(true)} bgClass={bgClass} />
+                </div>
               </div>
 
               {notes.length > 0 && (
@@ -645,7 +652,7 @@ function App() {
             </>
           ) : null}
 
-          {/* CITY PHOTO GALLERY - BOTTOM LEFT */}
+          {/* CITY PHOTO UPLOAD - BOTTOM LEFT */}
           {weather && (
             <div className="city-photo-section">
               <p className="photo-prompt">Share photos of {city}</p>
@@ -653,27 +660,53 @@ function App() {
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"
                 multiple
-                onChange={async (e) => {
-                  const files = Array.from(e.target.files);
-                  for (const file of files) {
-                    const formData = new FormData();
-                    formData.append('photo', file);
-                    try {
-                      await fetch(`http://localhost:5000/cities/${encodeURIComponent(city)}/photos`, {
-                        method: 'POST',
-                        body: formData,
-                      });
-                    } catch (err) {
-                      console.error('Error uploading photo:', err);
-                    }
-                  }
-                  // Refresh photos
-                  await fetchCityPhotos(city);
-                  e.target.value = ''; // Reset input
-                }}
+                onChange={(e) => setSelectedPhotoFiles(Array.from(e.target.files))}
                 className="photo-upload"
               />
-              <GalleryButton onClick={() => setShowGalleryPopup(true)} bgClass={bgClass} />
+              {(selectedPhotoFiles.length > 0 || isUploadingPhotos || uploadComplete) && (
+                isUploadingPhotos ? (
+                  <div className="upload-loader-container">
+                    <UploadLoader />
+                    <div className="uploading-text">Uploading</div>
+                  </div>
+                ) : uploadComplete ? (
+                  <div className="upload-complete">Upload Complete</div>
+                ) : (
+                  <button
+                    className="upload-photo-btn"
+                    onClick={async () => {
+                      if (selectedPhotoFiles.length > 0) {
+                        setIsUploadingPhotos(true);
+                        // Perform uploads
+                        const uploadPromises = selectedPhotoFiles.map(async (file) => {
+                          const formData = new FormData();
+                          formData.append('photo', file);
+                          try {
+                            await fetch(`http://localhost:5000/cities/${encodeURIComponent(city)}/photos`, {
+                              method: 'POST',
+                              body: formData,
+                            });
+                          } catch (err) {
+                            console.error('Error uploading photo:', err);
+                          }
+                        });
+                        await Promise.all(uploadPromises);
+                        // Refresh photos
+                        await fetchCityPhotos(city);
+                        setIsUploadingPhotos(false);
+                        setUploadComplete(true);
+                        setSelectedPhotoFiles([]);
+                        // Reset input
+                        const input = document.querySelector('.photo-upload');
+                        if (input) input.value = '';
+                        setTimeout(() => setUploadComplete(false), 2000);
+                      }
+                    }}
+                  >
+                    Upload Selected Photo
+                  </button>
+                )
+              )}
             </div>
           )}
         </div>
