@@ -112,9 +112,9 @@
 }
 
 .close-modal {
-  position: absolute;
-  top: -50px;
-  right: 0;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: none;
@@ -127,6 +127,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.3s ease;
+  z-index: 10;
 }
 
 .close-modal:hover {
@@ -247,7 +248,8 @@
   }
   
   .close-modal {
-    top: -40px;
+    top: 15px;
+    right: 15px;
     width: 35px;
     height: 35px;
     font-size: 20px;

@@ -277,6 +277,8 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .history-list li {
@@ -333,25 +335,6 @@ body {
   width: auto;
 }
 
-.close-btn-top {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: var(--close-btn-bg);
-  border: none;
-  padding: 10px 15px;
-  color: var(--button-text);
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 18px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
 
 .close-btn {
   position: fixed;
@@ -895,7 +878,9 @@ body {
   background: rgba(255,255,255,0.2);
   padding: 10px;
   border-radius: 10px;
-  max-height: 200px;
+  position: sticky;
+  top: 20px;
+  max-height: 60vh;
   overflow-y: auto;
 }
 .history h3 {
